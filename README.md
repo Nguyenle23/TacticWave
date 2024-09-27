@@ -1,1 +1,61 @@
 # TacticWave
+![TacticWave Logo](TacticWave/Software/Assets/logo.jpg)
+
+
+## Table of Contents
+- [TacticWave](#tacticwave)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Team](#team)
+  - [Product Overview](#product-overview)
+    - [Key Features:](#key-features)
+    - [Advanced AI Features:](#advanced-ai-features)
+  - [Installation](#installation)
+
+## Introduction
+Welcome, we’re <strong>Ohana</strong>, and we’ve developed an innovative system specifically designed to support individuals who are both deaf and blind: <strong>TactiWave</strong>. Our solution empowers users to perceive and respond to their surroundings by converting spoken language into tactile vibrations felt through a wearable device. By integrating speech-to-text technology, emotion detection, and tactile feedback, we enable real-time communication and enhance safety by identifying urgent messages and emotional cues. In addition, TactiWave offers a unique emergency alert feature that uses specific tactile patterns to signal danger or critical situations, ensuring users can respond promptly to emergencies. With TactiWave, we aim to break down barriers and create a more inclusive world for those facing dual sensory challenges. TactiWave – Feel the World.
+
+## Team
+Meet the brilliant minds behind TacticWave:
+
+- **Nguyen Huynh THao My** - Team Leader & 
+  - Task: Business Analysis 
+  - [Contact](https://www.facebook.com/profile.php?id=100028976440230)
+
+- **Dang Nguyen Nam Anh** - AI Developer
+  - Task: Voice Recognition, Speech-to-Text
+  - [Contact](https://www.facebook.com/profile.php?id=100016974122598)
+
+- **Le Nguyen Binh Nguyen** - Hardware Developer
+  - Task: ESP32 Development
+  - [Contact](https://www.facebook.com/nguyenle23.iu/)
+
+- **Pham Duc Dat** - Mobile Developer
+  - Task: Flutter
+  - [Contact](https://www.facebook.com/datbenho84)
+
+- **Nguyen Hoang Luan** - Mobile Developer
+  - Task: Flutter
+  - [Contact](https://www.facebook.com/luan.nguyen.007)
+
+## Product Overview
+TacticWave is a comprehensive strategy and collaboration tool designed to help teams plan, execute, and analyze their strategies in real-time. Whether you're managing a project, planning a marketing campaign, or coordinating a military operation, TacticWave provides the tools you need to succeed.
+
+### Key Features:
+- **Real-Time Haptic Communication**: Converts speech and sounds into vibration patterns.
+- **Emergency Alerts**: Automatically activates vibrations upon detecting emergency signals (fire alarms, car horns).
+- **Mobile Integration**: Mobile app allows users to adjust vibration intensity and patterns.
+- **Alphabet Mode**: Converts text messages into vibrations based on the alphabet.
+
+### Advanced AI Features:
+- **Speech-to-Vibration Conversion**: AI converts speech into vibrations for direct perception by deaf-blind individuals.
+- **Emergency Signal Recognition**: Device automatically detects and responds to environmental signals (like car horns, fire alarms).
+- **Customizable Vibration Patterns**: Users can adjust vibration patterns and intensity via the mobile app.
+
+## Installation
+To get started with TacticWave, follow these steps:
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/yourusername/TacticWave.git
+   cd TacticWave
