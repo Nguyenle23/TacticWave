@@ -53,6 +53,6 @@ Approximately 0.2% to 2% of the global population are both deaf and blind, and m
 
 ### Advanced AI Features:
 - **Speech-to-Vibration Conversion**: AI converts speech into vibrations for direct perception by deaf-blind individuals.
-Emergency Signal Recognition: The device automatically detects and responds to environmental signals (such as car horns and fire alarms).
+- **Emergency Signal Recognition**: The device automatically detects and responds to environmental signals (such as car horns and fire alarms).
 - **Customizable Vibration Patterns**: Users can adjust vibration patterns and intensity via the mobile app.
 
