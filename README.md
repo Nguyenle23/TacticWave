@@ -1,6 +1,5 @@
 # TacticWave
-![TacticWave Logo](TacticWave/Software/Assets/logo.jpg)
-
+<img src="https://github.com/Nguyenle23/TacticWave/blob/main/Assets/logo.jpg" width="450" height="300" />
 
 ## Table of Contents
 - [TacticWave](#tacticwave)
@@ -38,8 +37,14 @@ Meet the brilliant minds behind TacticWave:
   - Task: Flutter
   - [Contact](https://www.facebook.com/luan.nguyen.007)
 
-## Product Overview
-TacticWave is a comprehensive strategy and collaboration tool designed to help teams plan, execute, and analyze their strategies in real-time. Whether you're managing a project, planning a marketing campaign, or coordinating a military operation, TacticWave provides the tools you need to succeed.
+## Problems Overview
+Approximately 0.2% to 2% of the global population are both deaf and blind, and many struggle daily due to the lack of accessible technology.
+
+### Our Solution
+<img src="https://github.com/Nguyenle23/TacticWave/blob/main/Assets/tacticwave.png" width="450" height="300" />
+
+### Workflow:
+<img src="https://github.com/Nguyenle23/TacticWave/blob/main/Assets/workflow.jpg" width="450" height="300" />
 
 ### Key Features:
 - **Real-Time Haptic Communication**: Converts speech and sounds into vibration patterns.
@@ -52,10 +57,3 @@ TacticWave is a comprehensive strategy and collaboration tool designed to help t
 - **Emergency Signal Recognition**: Device automatically detects and responds to environmental signals (like car horns, fire alarms).
 - **Customizable Vibration Patterns**: Users can adjust vibration patterns and intensity via the mobile app.
 
-## Installation
-To get started with TacticWave, follow these steps:
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/TacticWave.git
-   cd TacticWave
