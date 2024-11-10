@@ -1,0 +1,25 @@
+/* index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for the project */
+body {
+  @apply bg-gray-100 text-gray-900;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-semibold;
+}
+
+a {
+  @apply text-blue-600 hover:text-blue-800;
+}
+
+button {
+  @apply bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700;
+}
+
+input, textarea {
+  @apply border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
