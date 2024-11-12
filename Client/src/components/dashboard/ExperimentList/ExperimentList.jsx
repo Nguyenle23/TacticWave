@@ -14,7 +14,7 @@ export const ExperimentList = ({ experiments }) => {
           <thead>
             <tr className="border-b">
               <th className="p-2 text-left text-sm text-gray-500">Date</th>
-              <th className="p-2 text-left text-sm text-gray-500">Title</th>
+              <th className="p-2 text-left text-sm text-gray-500">Name</th>
               <th className="p-2 text-left text-sm text-gray-500">Matrix</th>
               <th className="p-2 text-left text-sm text-gray-500">Creator</th>
               <th className="p-2 text-left text-sm text-gray-500">Actions</th>
