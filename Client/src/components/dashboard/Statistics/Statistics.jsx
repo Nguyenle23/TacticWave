@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
-import { StatisticsCard } from './StatisticsCard';
-import { Button } from '../../commons/Button';
-import { Modal } from '../../commons/Modal';
+import React, { useState } from "react";
+import { StatisticsCard } from "./StatisticsCard";
+import { Button } from "../../commons/Button";
+import { Modal } from "../../commons/Modal";
 
 export const Statistics = () => {
   const [showModal, setShowModal] = useState(false);
 
   const stats = [
-    { title: 'Experiment', count: '7' },
-    { title: 'Creator', count: '5' },
-    { title: 'Matrix 3x3', count: '2' },
-    { title: 'Matrix 4x4', count: '2' },
-    { title: 'Matrix 5x5', count: '3' },
+    { title: "Experiment", count: "7" },
+    { title: "Creator", count: "5" },
+    { title: "Matrix 3x3", count: "2" },
+    { title: "Matrix 4x4", count: "2" },
+    { title: "Matrix 5x5", count: "3" },
   ];
 
   const openModal = () => {
     setShowModal(true);
   };
-
   const closeModal = () => {
     setShowModal(false);
   };
@@ -35,7 +34,20 @@ export const Statistics = () => {
       </Button>
 
       {showModal && (
-        <Modal onClose={closeModal} />
+        <Modal
+          onClose={closeModal}
+          modalTitle="Choose Matrix Size"
+          selectField={{
+            name: "matrixSize",
+            label: "Matrix Size",
+            required: true,
+            options: [
+              { value: "3", label: "Matrix 3x3" },
+              { value: "4", label: "Matrix 4x4" },
+              { value: "5", label: "Matrix 5x5" },
+            ],
+          }}
+        />
       )}
     </div>
   );

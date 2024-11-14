@@ -21,7 +21,7 @@
 import React from "react";
 import { MoreVertical } from "lucide-react";
 
-export const ExperimentItem = ({ date, title, matrix, creator }) => {
+export const ExperimentItem = ({ date, title, matrix, totalNodes, creator }) => {
   return (
       <tbody>
         <tr className="border-b hover:bg-gray-100">
@@ -32,6 +32,7 @@ export const ExperimentItem = ({ date, title, matrix, creator }) => {
               {matrix}
             </span>
           </td>
+          <td className="p-2 text-sm">{totalNodes}</td>
           <td className="p-2 text-sm">{creator}</td>
           <td className="p-2">
             <MoreVertical className="cursor-pointer text-gray-500" size={20} />

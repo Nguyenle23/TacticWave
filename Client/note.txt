@@ -1,0 +1,270 @@
+button property
+
+{buttonProperty && (
+        <div className="md:w-1/3 bg-white p-4 border-r">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Node Configuration</h2>
+            <Button
+              className="px-6 py-0.5 bg-white text-blue-500 rounded-full hover:bg-blue-500 hover:text-white"
+              onClick={() => setButtonProperty("")}
+            >
+              <XIcon />
+            </Button>
+          </div>
+
+          <div className="flex items-center mb-4">
+            <button className="px-6 py-0.5 bg-gray-200 text-blue-500 rounded-full mr-2 hover:bg-gray-300">
+              Node Number <strong>{buttonProperty}</strong>
+            </button>
+            {/* <button className="px-6 py-0.5 bg-gray-200 text-blue-500 rounded-full mr-2 hover:bg-gray-300">
+              Permissions
+            </button> */}
+          </div>
+
+          {/* <hr className="border mb-2 border-black rounded-lg" /> */}
+
+          {/* <div className="flex items-center mb-3 space-x-2 py-2">
+            <button className="px-6 py-0.5 bg-gray-200 rounded-full mr-2 hover:bg-gray-300">
+              &#x2716;
+            </button>
+            <button className="px-6 py-0.5 bg-gray-200 rounded-full mr-2 hover:bg-gray-300">
+              <ArrowBigLeft color="black" />
+            </button>
+            <button className="px-6 py-0.5 bg-gray-200 rounded-full mr-2 hover:bg-gray-300">
+              <ArrowBigRight color="black" />
+            </button>
+          </div> */}
+
+          <div className="space-y-6">
+            {/* Intensity Slider */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Intensity (0 - 255): {intensity}
+              </label>
+              <div className="relative">
+                <input
+                  type="range"
+                  min="0"
+                  max="255"
+                  value={intensity}
+                  onChange={(e) => setIntensity(e.target.value)}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                        focus:outline-none focus:ring-0
+                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                        [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
+                        [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                        [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                        [&::-webkit-slider-thumb]:hover:scale-110
+                        [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
+                        [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
+                        [&::-moz-range-thumb]:border-0 
+                        [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
+                        [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                        [&::-moz-range-thumb]:hover:scale-110
+                        [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
+                        [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
+                  style={{
+                    background: getSliderBackground(intensity, 255),
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Duration Slider */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Duration (seconds): {duration}
+              </label>
+              <div className="relative">
+                <input
+                  type="range"
+                  min="0"
+                  max="15"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                        focus:outline-none focus:ring-0
+                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                        [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
+                        [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                        [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                        [&::-webkit-slider-thumb]:hover:scale-110
+                        [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
+                        [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
+                        [&::-moz-range-thumb]:border-0 
+                        [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
+                        [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                        [&::-moz-range-thumb]:hover:scale-110
+                        [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
+                        [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
+                  style={{
+                    background: getSliderBackground(duration, 15),
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Type Radio Buttons */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Type
+              </label>
+              <div className="flex items-center space-x-6">
+                <label className="flex items-center cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="type"
+                    value="Continue"
+                    checked={type === "Continue"}
+                    onChange={() => setType("Continue")}
+                    className="hidden"
+                  />
+                  <div
+                    className="w-5 h-5 border-2 border-gray-300 rounded-full mr-2 flex items-center justify-center
+                          group-hover:border-blue-500 transition-colors duration-200"
+                  >
+                    {type === "Continue" && (
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    )}
+                  </div>
+                  <span className="text-sm text-gray-700 group-hover:text-blue-500">
+                    Continue
+                  </span>
+                </label>
+
+                <label className="flex items-center cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="type"
+                    value="Discrete"
+                    checked={type === "Discrete"}
+                    onChange={() => setType("Discrete")}
+                    className="hidden"
+                  />
+                  <div
+                    className="w-5 h-5 border-2 border-gray-300 rounded-full mr-2 flex items-center justify-center
+                          group-hover:border-blue-500 transition-colors duration-200"
+                  >
+                    {type === "Discrete" && (
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    )}
+                  </div>
+                  <span className="text-sm text-gray-700 group-hover:text-blue-500">
+                    Discrete
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-4 pt-4">
+              <button
+                className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg
+                         hover:bg-orange-600 transition-colors duration-200"
+              >
+                Save & Out
+              </button>
+              <button
+                className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg
+                         hover:bg-green-600 transition-colors duration-200"
+              >
+                Test Node
+              </button>
+              <button
+                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg
+                         hover:bg-blue-600 transition-colors duration-200"
+              >
+                Save & Next Node
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Intensity (0 - 255): {intensity}
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="255"
+                value={intensity}
+                onChange={(e) => setIntensity(e.target.value)}
+                className="w-full appearance-none h-2 rounded-lg focus:outline-none focus:ring-0 focus:shadow-none"
+                style={{
+                  WebkitAppearance: "none",
+                  MozAppearance: "none",
+                  appearance: "none",
+                }}
+              />
+              <div className="text-sm text-gray-500"></div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Duration (seconds): {duration}
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="15"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                className="w-full appearance-none h-2 rounded-lg focus:outline-none focus:ring-0 focus:shadow-none"
+                style={{
+                  WebkitAppearance: "none",
+                  MozAppearance: "none",
+                  appearance: "none",
+                }}
+              />
+            </div>
+
+            {/* Type Radio Buttons */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Type</label>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="type"
+                    value="Continue"
+                    checked={type === "Continue"}
+                    onChange={() => setType("Continue")}
+                    className="mr-2"
+                  />
+                  Continue
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="type"
+                    value="Discrete"
+                    checked={type === "Discrete"}
+                    onChange={() => setType("Discrete")}
+                    className="mr-2"
+                  />
+                  Discrete
+                </label>
+              </div>
+            </div>
+
+            <div className="flex space-x-4 mt-4">
+              <button
+                onClick={handleSave}
+                className="flex-grow p-2 bg-orange-500 text-white rounded hover:bg-orange-700"
+              >
+                Save & Out
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex-grow p-2 bg-green-500 text-white rounded hover:bg-green-700"
+              >
+                Test Node
+              </button>
+              <button className="flex-grow p-2 bg-blue-500 text-white rounded">
+                Save & Next Node
+              </button>
+            </div>
+          </div>
+        </div>
+      )}

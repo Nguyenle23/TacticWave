@@ -16,6 +16,7 @@ export const ExperimentList = ({ experiments }) => {
               <th className="p-2 text-left text-sm text-gray-500">Date</th>
               <th className="p-2 text-left text-sm text-gray-500">Name</th>
               <th className="p-2 text-left text-sm text-gray-500">Matrix</th>
+              <th className="p-2 text-left text-sm text-gray-500">Total Nodes</th>
               <th className="p-2 text-left text-sm text-gray-500">Creator</th>
               <th className="p-2 text-left text-sm text-gray-500">Actions</th>
             </tr>
