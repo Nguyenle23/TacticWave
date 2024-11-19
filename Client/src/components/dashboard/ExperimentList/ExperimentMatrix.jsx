@@ -11,13 +11,16 @@ import {
 import { Button } from "../../commons/Button";
 import { Modal } from "../../commons/Modal";
 import { ModalAction } from "../../commons/ModalAction";
+import { createRecord } from "../../apis/callAPI";
 
 export const ExperimentMatrix = ({}) => {
+  //ui slider
   const getSliderBackground = (value, max) => {
     const percentage = (value / max) * 100;
     return `linear-gradient(to right, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%)`;
   };
 
+  //data matrix size
   const location = useLocation();
   const matrixSize = location.state.matrixSize;
   console.log(matrixSize);
@@ -29,7 +32,8 @@ export const ExperimentMatrix = ({}) => {
   const closeModal = () => {
     setShowModal(false);
   };
-
+  const [editingListing, setEditingListing] = useState(null);
+  //options menu: edit and delete
   const [showOptions, setShowOptions] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -68,27 +72,60 @@ export const ExperimentMatrix = ({}) => {
   };
   // Function to handle the 'Edit' button click
   const handleEditClick = (listing) => {
+    setEditingListing(listing);
     setEditButtonProperty(listing.node);
     setIntensity(listing.intensity);
     setDuration(listing.duration);
     setType(listing.type);
   };
+
   // Function to save changes and update the listings array
+  // const saveEditAndOut = () => {
+  //   console.log("editButtonProperty:", editButtonProperty);
+  //   console.log("intensity:", intensity);
+  //   console.log("duration:", duration);
+  //   console.log("type:", type);
+  
+  //   // Update the listing with the matching order
+  //   setListings((prevListings) =>
+  //     prevListings.map((item) =>
+  //       item.order === editButtonProperty
+  //         ? { ...item, intensity, duration, type } // Update only the matched item
+  //         : item
+  //     )
+  //   );
+  
+  //   // Reset the edit form and close the configuration panel
+  //   setEditButtonProperty(null);
+  //   setError(""); // Reset any error messages if needed
+  // };
   const saveEditAndOut = () => {
-    // Update the listing with the matching order
+    if (!editingListing) return;
+
     setListings((prevListings) =>
       prevListings.map((item) =>
-        item.order === editButtonProperty
-          ? { ...item, intensity, duration, type } // Update only the matched item
+        item.order === editingListing.order
+          ? {
+              ...item,
+              intensity: parseInt(intensity),
+              duration: parseInt(duration),
+              type: type,
+            }
           : item
       )
     );
-    console.log(listings);
-    // Reset the edit form and close the configuration panel
+
+    // Reset the edit state
+    setEditingListing(null);
     setEditButtonProperty(null);
-    setError(""); // Reset any error messages if needed
+    setIntensity(0);
+    setDuration(0);
+    setType("");
+    setError("");
   };
 
+
+  // data matrix properties
   const initialOrders = {};
   for (let row = 0; row < matrixSize; row++) {
     for (let col = 0; col < matrixSize; col++) {
@@ -111,26 +148,28 @@ export const ExperimentMatrix = ({}) => {
   const [duration, setDuration] = useState(0);
   const [type, setType] = useState("");
   const [nameExperiment, setNameExperiment] = useState("");
-  const [listings, setListings] = useState([
-    { order: 1, node: 3, intensity: 56, duration: 5, type: "Continue" },
-    { order: 2, node: 3, intensity: 158, duration: 12, type: "Discrete" },
-    {
-      order: 3,
-      node: 6,
-      intensity: 175,
-      duration: 3,
-      type: "Continue - Node 3",
-    },
-    {
-      order: 4,
-      node: 9,
-      intensity: 175,
-      duration: 3,
-      type: "Continue - Node 6",
-    },
-    { order: 5, node: 9, intensity: 175, duration: 3, type: "Discrete" },
-    { order: 6, node: 12, intensity: 175, duration: 3, type: "Continue" },
-  ]);
+  const [creator, setCreator] = useState("");
+  const [listings, setListings] = useState([]);
+  // const [listings, setListings] = useState([
+  //   { order: 1, node: 3, intensity: 56, duration: 5, type: "Continue" },
+  //   { order: 2, node: 3, intensity: 158, duration: 12, type: "Discrete" },
+  //   {
+  //     order: 3,
+  //     node: 6,
+  //     intensity: 175,
+  //     duration: 3,
+  //     type: "Continue - Node 3",
+  //   },
+  //   {
+  //     order: 4,
+  //     node: 9,
+  //     intensity: 175,
+  //     duration: 3,
+  //     type: "Continue - Node 6",
+  //   },
+  //   { order: 5, node: 9, intensity: 175, duration: 3, type: "Discrete" },
+  //   { order: 6, node: 12, intensity: 175, duration: 3, type: "Continue" },
+  // ]);
 
   const saveAndOut = () => {
     if (!intensity || !duration || !type) {
@@ -153,7 +192,36 @@ export const ExperimentMatrix = ({}) => {
     setType("");
   };
 
-  console.log(listings);
+  const dataObject = {
+    experimentName: nameExperiment,
+    matrixSize: matrixSize,
+    records: listings,
+    creator: creator,
+  };
+  console.log(dataObject);
+
+  const createRecordHandler = async () => {
+    try {
+      //check if all field in dataObject is filled
+      if (
+        !dataObject.experimentName ||
+        !dataObject.creator ||
+        dataObject.records.length === 0
+      ) {
+        setError("Please fill out all required fields!");
+        return;
+      } else {
+        const data = await createRecord(dataObject);
+        console.log(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const deleteRecordHandler = async () => {
+    //set listing empty
+    setListings([]);
+  };
 
   return (
     <div className="flex flex-col md:flex-row w-full h-fit bg-gray-100">
@@ -169,18 +237,18 @@ export const ExperimentMatrix = ({}) => {
             Matrix Size: {matrixSize}x{matrixSize}
           </h2>
           <div className="space-x-2">
-            <Button className="p-2 bg-gray-500 rounded">Download</Button>
-            {/* <button className="p-2 bg-blue-500 text-white rounded">
-              Create
-            </button> */}
+            {/* <Button className="p-2 bg-gray-500 rounded">Download</Button> */}
             <Button
-              className="p-2 bg-blue-500 text-white rounded"
+              className="p-2 bg-blue-500 text-white rounded hover:cursor-pointer"
               onClick={openModal}
             >
               Create Record
             </Button>
-            <Button className="p-2 bg-red-500 text-white rounded">
-              Delete All
+            <Button
+              onClick={deleteRecordHandler}
+              className="p-2 bg-red-500 text-white rounded hover:bg-red-700 hover:cursor-pointer"
+            >
+              Delete All Records
             </Button>
           </div>
         </div>
@@ -198,10 +266,10 @@ export const ExperimentMatrix = ({}) => {
               </tr>
             </thead>
             <tbody>
-              {listings.length === 0 ? (
+              {listings.length === 0 || error === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center">
-                    No records found
+                  <td colSpan="6" className="text-center text-red">
+                    Please create a record
                   </td>
                 </tr>
               ) : (
@@ -283,8 +351,15 @@ export const ExperimentMatrix = ({}) => {
               placeholder: "Enter experiment name",
               required: true,
             }}
+            additionalField={{
+              name: "creator",
+              label: "Creator",
+              placeholder: "Enter your name",
+              required: true,
+            }}
             onSubmit={(e) => {
               setNameExperiment(e.experimentName);
+              setCreator(e.creator);
               closeModal();
             }}
           />
@@ -294,11 +369,19 @@ export const ExperimentMatrix = ({}) => {
           <>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">
-                Experiment Name: {nameExperiment}
+                Experiment Name: {nameExperiment} -- Creator: {creator}
               </h2>
-              {/* <button className="p-2 bg-blue-500 text-white rounded">
-                Save
-              </button> */}
+
+              {error && (
+                <div className="bg-red-500 text-white p-2 rounded">{error}</div>
+              )}
+
+              <Button
+                onClick={createRecordHandler}
+                className="p-2 bg-green-500 text-white rounded"
+              >
+                Submit Experiment
+              </Button>
             </div>
             <div
               className={`grid grid-cols-${matrixSize} gap-4 mt-1`}
@@ -597,7 +680,7 @@ export const ExperimentMatrix = ({}) => {
                 onClick={() => saveEditAndOut(editButtonProperty)}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-l hover:bg-blue-600 transition-colors duration-200"
               >
-                Save
+                Adjust
               </button>
             </div>
 
