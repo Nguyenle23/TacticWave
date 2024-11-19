@@ -17,7 +17,6 @@
 //       setError("");
 //       console.log({ name, matrixSize });
 
-
 //       // Navigate to the next page and pass data
 //       navigate("/matrix", { state: { name, matrixSize } });
 //     }
@@ -103,7 +102,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const Modal = ({ onClose, modalTitle, inputField, selectField, onSubmit }) => {
+export const Modal = ({
+  onClose,
+  modalTitle,
+  inputField,
+  additionalField,
+  selectField,
+  onSubmit,
+}) => {
   const [formValues, setFormValues] = useState({});
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -116,8 +122,11 @@ export const Modal = ({ onClose, modalTitle, inputField, selectField, onSubmit }
     e.preventDefault();
 
     // Validate required fields
-    if ((inputField?.required && !formValues[inputField.name]) ||
-        (selectField?.required && !formValues[selectField.name])) {
+    if (
+      (inputField?.required && !formValues[inputField.name]) ||
+      (additionalField?.required && !formValues[additionalField.name]) ||
+      (selectField?.required && !formValues[selectField.name])
+    ) {
       setError("Please fill out all required fields.");
       return;
     } else {
@@ -126,9 +135,9 @@ export const Modal = ({ onClose, modalTitle, inputField, selectField, onSubmit }
 
       // If onSubmit is provided, call it; otherwise, navigate
       if (onSubmit) {
-        onSubmit(formValues);  // Use the custom submit handler
+        onSubmit(formValues); // Use the custom submit handler
       } else {
-        navigate("/matrix", { state: formValues });  // Default navigation
+        navigate("/matrix", { state: formValues }); // Default navigation
       }
     }
 
@@ -150,7 +159,7 @@ export const Modal = ({ onClose, modalTitle, inputField, selectField, onSubmit }
               <hr className="mt-4" />
               <div className="mt-4">
                 {error && <p className="text-red-500 mb-4">{error}</p>}
-                
+
                 {/* Render input field if provided */}
                 {inputField && (
                   <div className="mb-4">
@@ -169,6 +178,28 @@ export const Modal = ({ onClose, modalTitle, inputField, selectField, onSubmit }
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       placeholder={inputField.placeholder || ""}
                       required={inputField.required}
+                    />
+                  </div>
+                )}
+
+                {/* Render additional input field if provided */}
+                {additionalField && (
+                  <div className="mb-4">
+                    <label
+                      htmlFor={additionalField.name}
+                      className="block text-gray-700 font-bold mb-2"
+                    >
+                      {additionalField.label}
+                    </label>
+                    <input
+                      type="text"
+                      id={additionalField.name}
+                      name={additionalField.name}
+                      value={formValues[additionalField.name] || ""}
+                      onChange={(e) => handleChange(e, additionalField.name)}
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      placeholder={additionalField.placeholder || ""}
+                      required={additionalField.required}
                     />
                   </div>
                 )}
