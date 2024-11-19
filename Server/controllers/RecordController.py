@@ -80,6 +80,3 @@ class RecordController:
             return check_and_process_excel_files(folder_name)
         else:
             return jsonify({'error': 'Invalid request method'}), 405
-
-    def deleteRecord():
-        pass
