@@ -27,3 +27,17 @@ export const createRecord = async (data) => {
     throw error;
   }
 };
+
+
+export const runExp = async (data) => {
+  try {
+    const response = await axios.post(`${url_base}/runexp/`, data);
+    return response;
+  } catch (error) {
+    console.error("Network Error:", error.message);
+    if (error.response) {
+      console.error("Server Response:", error.response.data);
+    }
+    throw error;
+  }
+};
