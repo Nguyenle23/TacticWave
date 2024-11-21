@@ -21,19 +21,27 @@ def convert_node_number(node_number):
         6: 5,
         7: 17,
         8: 16,
-        9: 4
+        9: 4,
+        10: 2,
+        11: 15,
+        12: 32,
+        13: 33,
+        14: 25,
+        15: 26,
+        16: 27
     }
 
     return mapping.get(node_number, None)
 
 
-def send_motor_command(node_number, duration):
+def send_motor_command(node_number, duration, intensity):
     """
     Gửi lệnh điều khiển motor với node_number và thời gian duration (ms).
     """
     data = {
         "node_number": node_number,
-        "duration": duration
+        "duration": duration,
+        "intensity": intensity
     }
 
     try:
@@ -65,6 +73,7 @@ class RunExpController:
                     for item in motor_data:
                         node_number = convert_node_number(item.get('Node number'))
                         duration = item.get('Duration')*1000
+                        intensity = item.get('Intensity')
 
                         # Validate required fields
                         if node_number is None or duration is None:
@@ -72,7 +81,7 @@ class RunExpController:
                             continue
 
                         # Send the motor command
-                        send_motor_command(node_number, duration)
+                        send_motor_command(node_number, duration, intensity)
 
                         # Collecting success response
                         responses.append({
