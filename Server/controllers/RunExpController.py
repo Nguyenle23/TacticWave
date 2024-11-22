@@ -7,6 +7,7 @@ esp32_port = 'COM4'  # Thay bằng cổng Serial ESP32
 baud_rate = 115200
 timeout = 1
 
+
 def convert_node_number(node_number):
     """
     Convert node number according to the provided mapping:
@@ -43,7 +44,8 @@ def send_motor_command(node_number, duration):
             print(f"Đã gửi: {json_data}")
 
             # Nhận phản hồi từ ESP32
-            time.sleep(duration / 1000 + 1)  # Chờ duration + 1 giây để nhận phản hồi
+            # Chờ duration + 1 giây để nhận phản hồi
+            time.sleep(duration / 1000 + 1)
             if ser.in_waiting > 0:
                 response = ser.readline().decode('utf-8').strip()
                 print(f"Phản hồi từ ESP32: {response}")
@@ -51,6 +53,7 @@ def send_motor_command(node_number, duration):
                 print("Không nhận được phản hồi từ ESP32.")
     except Exception as e:
         print(f"Lỗi: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 class RunExpController:
@@ -63,12 +66,14 @@ class RunExpController:
                 if isinstance(motor_data, list):
                     responses = []
                     for item in motor_data:
-                        node_number = convert_node_number(item.get('Node number'))
+                        node_number = convert_node_number(
+                            item.get('Node number'))
                         duration = item.get('Duration')*1000
 
                         # Validate required fields
                         if node_number is None or duration is None:
-                            responses.append({'error': 'node_number and duration are required'})
+                            responses.append(
+                                {'error': 'node_number and duration are required'})
                             continue
 
                         # Send the motor command
