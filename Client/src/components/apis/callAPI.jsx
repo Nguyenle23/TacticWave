@@ -7,10 +7,7 @@ export const getAllRecords = async () => {
     const response = await axios.get(`${url_base}/record/`);
     return response;
   } catch (error) {
-    console.error("Network Error:", error.message);
-    if (error.response) {
-      console.error("Server Response:", error.response.data);
-    }
+    console.error("Server Response:", error.response.data);
     throw error;
   }
 };
@@ -20,24 +17,29 @@ export const createRecord = async (data) => {
     const response = await axios.post(`${url_base}/record/`, data);
     return response;
   } catch (error) {
-    console.error("Network Error:", error.message);
-    if (error.response) {
-      console.error("Server Response:", error.response.data);
-    }
+    console.error("Server Response:", error.response.data);
     throw error;
   }
 };
 
+export const submitFeedback = async (data) => {
+  try {
+    console.log(data);
+    const response = await axios.post(`${url_base}/feedback/`, data);
+    return response;
+  } catch (error) {
+    console.error("Server Response:", error.response.data);
+    throw error;
+  }
+}
 
 export const runExp = async (data) => {
   try {
-    const response = await axios.post(`${url_base}/runexp/`, data);
-    return response;
+    console.log(data);
+    // const response = await axios.post(`${url_base}/runexp/`, data);
+    // return response;
   } catch (error) {
-    console.error("Network Error:", error.message);
-    if (error.response) {
-      console.error("Server Response:", error.response.data);
-    }
+    console.error("Server Response:", error.response.data);
     throw error;
   }
 };
