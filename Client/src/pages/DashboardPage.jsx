@@ -7,7 +7,6 @@ const DashboardPage = () => {
     <Layout>
       <Dashboard />
     </Layout>
-    
   );
 };
 

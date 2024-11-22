@@ -4,8 +4,6 @@ import { Button } from "../../commons/Button";
 import { Modal } from "../../commons/Modal";
 
 export const Statistics = () => {
-  const [showModal, setShowModal] = useState(false);
-
   const stats = [
     { title: "Experiment", count: "7" },
     { title: "Creator", count: "5" },
@@ -14,12 +12,9 @@ export const Statistics = () => {
     { title: "Matrix 5x5", count: "3" },
   ];
 
-  const openModal = () => {
-    setShowModal(true);
-  };
-  const closeModal = () => {
-    setShowModal(false);
-  };
+  const [showModal, setShowModal] = useState(false);
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   return (
     <div className="bg-white rounded-lg border p-4">

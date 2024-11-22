@@ -1,12 +1,12 @@
 export const NAVIGATION_ITEMS = [
   { icon: 'BarChart2', label: 'Dashboard', path: '/' },
-  { icon: 'FileText', label: 'Edit Experiment', path: '/edit' },
+  { icon: 'FileText', label: 'Create Experiment', path: '/matrix' },
   { icon: 'Menu', label: 'Run Experiment', path: '/run' },
 ];
 
 export const MANAGE_ITEMS = [
-  { icon: 'BarChart2', label: 'Dashboard', path: '/manage/dashboard' },
-  { icon: 'Menu', label: 'Run Experiment', path: '/manage/run' },
+  { icon: 'BarChart2', label: 'Feedback', path: '/manage/dashboard' },
+  { icon: 'Menu', label: 'Testing', path: '/manage/run' },
 ];
 
 export const OPTION_ITEMS = [
