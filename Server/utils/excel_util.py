@@ -1,99 +1,95 @@
 import os
 from datetime import datetime
 import pandas as pd
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill
 
 
-def export_data_to_excel(data, purposes):
+def export_data_to_excel(data_list, purposes):
     """
-    Export experiment data to an Excel file.
+    Export multiple experiment data objects to an Excel file, each saved to a separate sheet.
 
     Parameters:
-        data (dict): A dictionary containing the experiment data. 
-                     Expected keys: 'creator', 'experimentName', 'matrixSize', 'records'.
+        data_list (list): A list of dictionaries containing the experiment data.
+                          Each dictionary should have keys: 'creator', 'experimentName', 'matrixSize', etc.
+        purposes (str): The purpose of the export (e.g., 'feedback').
 
     Returns:
         tuple: The filename and absolute path of the generated Excel file.
     """
     # Create folder for saving files
-    if purposes == 'feedback':
-        folder_name = "Feedback Data"
+    folder_name = "Feedback Data" if purposes == 'feedback' else "Experiment Data"
 
-        if not os.path.exists(folder_name):
-            os.makedirs(folder_name)
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
 
+    # Generate the filename with timestamp
+    filename = os.path.join(
+        folder_name, datetime.now().strftime('%Y-%m-%d %H' + "h" + '%M' + 'p') + '.xlsx'
+    )
+
+    # Create a workbook
+    wb = Workbook()
+    wb.remove(wb.active)  # Remove the default sheet created by openpyxl
+
+    # Iterate over each data object in the list
+    for data in data_list:
         # Extract details from the input data
         creator = data.get('creator', 'Creator')
         experiment_name = data.get('experimentName', 'Experiment')
-        matrix_size = data.get('matrixSize', 'Size')
-        lor = data.get('levelOfRecognition', 'Level of Recognition')
         stageNumber = data.get('stageNumber', 'Stage Number')
-        totalNodes = data.get('totalNodes', 'Total Nodes')
-        config = data.get('config', [])
-        matrixGrid = data.get('matrixGrid', [])
+        sheet_name = f"Stage {stageNumber}" if stageNumber else "Sheet"
 
-        # Generate the filename with timestamp
-        filename = os.path.join(
-            folder_name, datetime.now().strftime('%Y-%m-%d %H' + "h" + '%M' + 'p') + '.xlsx'
-        )
+        # Prepare the data based on purposes
+        if purposes == 'feedback':
+            lor = data.get('levelOfRecognition', 'Level of Recognition')
+            config = data.get('config', [])
+            matrixGrid = data.get('matrixGrid', [])
 
-        # Generate the sheet name
-        sheet_name = f"{experiment_name} - {matrix_size}x{matrix_size} - {creator}"
+            # Convert config to a DataFrame
+            df = pd.DataFrame(config, columns=[
+                'Index', 'Node_number', 'Intensity', 'Duration', 'Order'])
 
-        # Convert config to a DataFrame
-        df = pd.DataFrame(config, columns=[
-            'Index', 'Node_number', 'Intensity', 'Duration', 'Order'])
+            # Convert matrixGrid to a DataFrame
+            df2 = pd.DataFrame(matrixGrid, columns=[
+                'index', 'nodeNumber', 'pressedCount'])
 
-        # Convert matrixGrid to a DataFrame
-        df2 = pd.DataFrame(matrixGrid, columns=[
-            'index', 'nodeNumber', 'pressedCount'])
+            # Combine columns
+            df3 = pd.concat([df, df2], axis=1)
 
-        # combine columns
-        df3 = pd.concat([df, df2], axis=1)
+            # Add additional columns with values copied if 'pressedCount' is not empty
+            df3['Level of Recognition'] = df3['pressedCount'].apply(lambda x: lor if pd.notnull(x) else '')
+            df3['Stage Number'] = df3['pressedCount'].apply(lambda x: stageNumber if pd.notnull(x) else '')
 
-        # add additional columns
-        df3['Level of Recognition'] = lor
-        df3['Stage Number'] = stageNumber
-        df3['Total Nodes'] = totalNodes
+        else:
+            records = data.get('records', [])
+            df3 = pd.DataFrame(records, columns=[
+                'Index', 'Node_number', 'Intensity', 'Duration', 'Order'])
 
-        # but not repeat the row values for the additional columns
-        df3.loc[1:, 'Level of Recognition'] = ''
-        df3.loc[1:, 'Stage Number'] = ''
-        df3.loc[1:, 'Total Nodes'] = ''
+        # Add the DataFrame to a new sheet in the workbook
+        ws = wb.create_sheet(title=sheet_name)
 
-        # Write to Excel file
-        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
-            df3.to_excel(writer, index=False, sheet_name=sheet_name)
+        # Add headers to the sheet
+        for col_idx, header in enumerate(df3.columns, start=1):
+            cell = ws.cell(row=1, column=col_idx, value=header)
+            # Apply yellow color for headers
+            if col_idx <= 5:  # Yellow for the first 5 columns
+                cell.fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+            else:  # Blue for the rest
+                cell.fill = PatternFill(start_color="87CEEB", end_color="87CEEB", fill_type="solid")
 
-        # Return the filename and absolute path
-        return filename, os.path.abspath(filename)
+        # Add data rows to the sheet
+        for r_idx, row in enumerate(df3.itertuples(index=False), start=2):
+            for c_idx, value in enumerate(row, start=1):
+                cell = ws.cell(row=r_idx, column=c_idx, value=value)
+                # Apply yellow color for data
+                if c_idx <= 5:  # Yellow for the first 5 columns
+                    cell.fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+                else:  # Blue for the rest
+                    cell.fill = PatternFill(start_color="87CEEB", end_color="87CEEB", fill_type="solid")
 
-        # Write to Excel fil
-    else:
-        folder_name = "Experiment Data"
-        if not os.path.exists(folder_name):
-            os.makedirs(folder_name)
+    # Save the workbook
+    wb.save(filename)
 
-        # Extract details from the input data
-        creator = data.get('creator', 'Creator')
-        experiment_name = data.get('experimentName', 'Experiment')
-        matrix_size = data.get('matrixSize', 'Size')
-        records = data.get('records', [])
-
-        # Generate the filename with timestamp
-        filename = os.path.join(
-            folder_name, datetime.now().strftime('%Y-%m-%d %H' + "h" + '%M' + 'p') + '.xlsx'
-        )
-
-        # Generate the sheet name
-        sheet_name = f"{experiment_name} - {matrix_size}x{matrix_size} - {creator}"
-
-        # Convert records to a DataFrame
-        df = pd.DataFrame(records, columns=[
-                          'Index', 'Node_number', 'Intensity', 'Duration', 'Order'])
-
-        # Write to Excel file
-        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name=sheet_name)
-
-        # Return the filename and absolute path
-        return filename, os.path.abspath(filename)
+    # Return the filename and absolute path
+    return filename, os.path.abspath(filename)

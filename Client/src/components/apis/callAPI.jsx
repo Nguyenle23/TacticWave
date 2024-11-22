@@ -35,9 +35,8 @@ export const submitFeedback = async (data) => {
 
 export const runExp = async (data) => {
   try {
-    console.log(data);
-    // const response = await axios.post(`${url_base}/runexp/`, data);
-    // return response;
+    const response = await axios.post(`${url_base}/runexp/`, data);
+    return response;
   } catch (error) {
     console.error("Server Response:", error.response.data);
     throw error;

@@ -10,12 +10,12 @@ export const MatrixGrid = ({ matrixSize, onUpdateListings }) => {
   }
 
   const [orders] = useState(initialOrders); // State to hold node mapping
-  const [pressCounts, setPressCounts] = useState({}); // Track the count of presses for each button
+  const [pressSequence, setPressSequence] = useState([]); // Store the sequence of presses
 
-  // Reset `pressCounts` when `onUpdateListings` is explicitly set to `null`
+  // Reset `pressSequence` when `onUpdateListings` is explicitly set to `null`
   useEffect(() => {
     if (onUpdateListings === null) {
-      setPressCounts({});
+      setPressSequence([]);
     }
   }, [onUpdateListings]);
 
@@ -23,26 +23,25 @@ export const MatrixGrid = ({ matrixSize, onUpdateListings }) => {
     const key = `${row}-${col}`;
     const nodeNumber = orders[key];
 
-    // Update press counts
-    setPressCounts((prevCounts) => {
-      const newCounts = { ...prevCounts };
-      newCounts[nodeNumber] = (newCounts[nodeNumber] || 0) + 1; // Increment count
+    setPressSequence((prevSequence) => {
+      // Prevent duplicate entries
+      const newSequence = prevSequence.includes(nodeNumber)
+        ? prevSequence
+        : [...prevSequence, nodeNumber];
 
       // Generate updated listings
-      const updatedListings = Object.entries(newCounts).map(
-        ([node, count], index) => ({
-          index: index + 1,
-          nodeNumber: parseInt(node, 10),
-          pressedCount: count,
-        })
-      );
+      const updatedListings = newSequence.map((node, index) => ({
+        index: index + 1,
+        nodeNumber: node,
+        pressedCount: 1, // Always 1 since each node is unique in the sequence
+      }));
 
       // Notify parent component with updated listings
       if (onUpdateListings) {
         onUpdateListings(updatedListings);
       }
 
-      return newCounts;
+      return newSequence;
     });
   };
 
@@ -57,7 +56,7 @@ export const MatrixGrid = ({ matrixSize, onUpdateListings }) => {
         Array.from({ length: matrixSize }).map((_, col) => {
           const key = `${row}-${col}`;
           const nodeNumber = orders[key];
-          const isPressed = pressCounts[nodeNumber] > 0; // Check if the button has been pressed at least once
+          const isPressed = pressSequence.includes(nodeNumber); // Check if the button is in the sequence
 
           return (
             <Button

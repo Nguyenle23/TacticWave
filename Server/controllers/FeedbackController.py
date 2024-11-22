@@ -6,6 +6,7 @@ class FeedbackController:
     def createFeedback():
         if request.method == 'POST':
             data = request.json
+            print(data)
             try:
                 filename, location = export_data_to_excel(data, "feedback")
                 return jsonify({'filename': filename, 'location': location})

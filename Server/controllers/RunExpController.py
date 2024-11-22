@@ -35,7 +35,16 @@ def convert_node_number(node_number):
     return mapping.get(node_number, None)
 
 
+def group_dicts_by_order(data_list):
+    grouped = {}
+    for item in data_list:
+        if 'order' in item:
+            grouped.setdefault(item['order'], []).append(item)
+    return list(grouped.values())
+
+
 def send_motor_command(node_number, duration, intensity):
+
     """
     Gửi lệnh điều khiển motor với node_number và thời gian duration (ms).
     """
@@ -44,7 +53,6 @@ def send_motor_command(node_number, duration, intensity):
         "duration": duration,
         "intensity": intensity
     }
-
     try:
         with serial.Serial(esp32_port, baud_rate, timeout=timeout) as ser:
             json_data = json.dumps(data)
@@ -69,16 +77,18 @@ class RunExpController:
         if request.method == 'POST':
             try:
                 motor_data = request.json  # This is now expected to be a list of motor commands
+                print(group_dicts_by_order(motor_data))
 
                 # Check if motor_data is a list
                 if isinstance(motor_data, list):
                     responses = []
                     for item in motor_data:
                         node_number = convert_node_number(
-                            item.get('Node number'))
+                            item.get('Node_number'))
                         duration = item.get('Duration')*1000
                         intensity = item.get('Intensity')
 
+                        print(node_number, duration, intensity)
                         # Validate required fields
                         if node_number is None or duration is None:
                             responses.append(
