@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import DashboardPage from './pages/DashboardPage';
 import MatrixPage from './pages/MatrixPage';
 import ExperimentTestingPage from './pages/ExperimentTestingPage';
+import ExperimentSetupPage from './pages/ExperimentSetupPage';
 
 const App = () => {
     return (
@@ -11,6 +12,7 @@ const App = () => {
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/matrix" element={<MatrixPage />} />
                 <Route path="/run/:id" element={<ExperimentTestingPage />} />
+                <Route path="/setup" element={<ExperimentSetupPage />} />
                 
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

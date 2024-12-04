@@ -2,6 +2,7 @@ import React from 'react';
 import { XIcon } from 'lucide-react';
 
 export const NodeConfiguration = ({
+  isSerial,
   isEdit = false,
   nodeNumber,
   intensity,
@@ -40,72 +41,74 @@ export const NodeConfiguration = ({
 
       <div className="space-y-6">
         {/* Intensity Slider */}
-        <div>
-          <label className="block text-lg font-medium text-gray-700 mb-2">
-            Intensity (0 - 255): {intensity}
-          </label>
-          <div className="relative">
-            <input
-              type="range"
-              min="0"
-              max="255"
-              value={intensity}
-              onChange={(e) => setIntensity(e.target.value)}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer
-                      focus:outline-none focus:ring-0
-                      [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                      [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
-                      [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                      [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                      [&::-webkit-slider-thumb]:hover:scale-110
-                      [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
-                      [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
-                      [&::-moz-range-thumb]:border-0 
-                      [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
-                      [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                      [&::-moz-range-thumb]:hover:scale-110
-                      [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
-                      [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
-              style={{
-                background: getSliderBackground(intensity, 255),
-              }}
-            />
-          </div>
+      <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}>
+        <label className="block text-lg font-medium text-gray-700 mb-2">
+          Intensity (0 - 255): {intensity}
+        </label>
+        <div className="relative">
+          <input
+            type="range"
+            min="0"
+            max="255"
+            value={intensity}
+            disabled={isSerial}
+            onChange={(e) => setIntensity(e.target.value)}
+            className="w-full h-2 rounded-lg appearance-none cursor-pointer
+                        focus:outline-none focus:ring-0
+                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                        [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
+                        [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                        [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                        [&::-webkit-slider-thumb]:hover:scale-110
+                        [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
+                        [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
+                        [&::-moz-range-thumb]:border-0 
+                        [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
+                        [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                        [&::-moz-range-thumb]:hover:scale-110
+                        [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
+                        [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
+            style={{
+              background: getSliderBackground(intensity, 255),
+            }}
+          />
         </div>
+      </div>
 
-        {/* Duration Slider */}
-        <div>
-          <label className="block text-lg font-medium text-gray-700 mb-2">
-            Duration (0 - 15 seconds): {duration}
-          </label>
-          <div className="relative">
-            <input
-              type="range"
-              min="0"
-              max="15"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                      focus:outline-none focus:ring-0
-                      [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                      [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
-                      [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                      [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                      [&::-webkit-slider-thumb]:hover:scale-110
-                      [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
-                      [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
-                      [&::-moz-range-thumb]:border-0 
-                      [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
-                      [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                      [&::-moz-range-thumb]:hover:scale-110
-                      [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
-                      [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
-              style={{
-                background: getSliderBackground(duration, 15),
-              }}
-            />
-          </div>
+      {/* Duration Slider */}
+      <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}>
+        <label className="block text-lg font-medium text-gray-700 mb-2">
+          Duration (0 - 15 seconds): {duration}
+        </label>
+        <div className="relative">
+          <input
+            type="range"
+            min="0"
+            max="15"
+            value={duration}
+            disabled={isSerial}
+            onChange={(e) => setDuration(e.target.value)}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                        focus:outline-none focus:ring-0
+                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                        [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
+                        [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                        [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                        [&::-webkit-slider-thumb]:hover:scale-110
+                        [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
+                        [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
+                        [&::-moz-range-thumb]:border-0 
+                        [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
+                        [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                        [&::-moz-range-thumb]:hover:scale-110
+                        [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
+                        [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
+            style={{
+              background: getSliderBackground(duration, 15),
+            }}
+          />
         </div>
+      </div>
 
         {/* Order Dropdown */}
         <div>

@@ -2,6 +2,7 @@ from flask import request, jsonify
 import serial
 import json
 import time
+import math
 
 esp32_port = 'COM4'  # Thay bằng cổng Serial ESP32
 baud_rate = 115200
@@ -38,10 +39,10 @@ def transform_motor_data(data):
     for item in data:
         # Extract and transform the values
         transformed_item = {
-            'Node_number': convert_node_number(item.get('Node_number')),
-            'Duration': item.get('Duration') * 1000 if item.get('Duration') else None,
-            'Intensity': item.get('Intensity'),
-            'Order': item.get('Order')
+            'Node_number': convert_node_number(item.get('node')),
+            'Duration': item.get('duration') * 1000 if item.get('duration') else None,
+            'Intensity': item.get('intensity'),
+            'Order': item.get('order')
         }
         transformed_data.append(transformed_item)
 
@@ -49,7 +50,6 @@ def transform_motor_data(data):
 
 def group_dicts_by_order(data_list):
     array = transform_motor_data(data_list)
-    print(array)
     grouped = {}
     for item in array:
         if 'Order' in item:
@@ -57,20 +57,15 @@ def group_dicts_by_order(data_list):
             grouped.setdefault(order, []).append(item)
     return list(grouped.values())
 
-def get_max_duration(data):
-    """
-    Lấy Duration lớn nhất từ danh sách các phần tử.
+def wrap_in_list(data):
+    return [[item] for item in data]
 
-    :param data: Danh sách chứa các danh sách nhỏ, mỗi danh sách chứa các dictionaries với key 'Duration'.
-    :return: Duration lớn nhất của mỗi nhóm.
-    """
+def get_max_duration(data):
+   
     max_durations = [max(group, key=lambda x: x['Duration'])['Duration'] for group in data]
     return max_durations
 
-def send_motor_command(item, max_duration):
-    """
-    Gửi lệnh điều khiển motor với node_number và thời gian duration (ms).
-    """
+def send_motor_command(item, max_duration, motor_delay):
     try:
         ser = serial.Serial(esp32_port, baud_rate, timeout=timeout)
         time.sleep(2)  # Đợi ESP32 ổn định kết nối
@@ -78,14 +73,14 @@ def send_motor_command(item, max_duration):
 
         # Chuyển mảng JSON thành chuỗi và thêm ký tự xuống dòng
         json_data = json.dumps(item) + '\n'
-
+        print("#############", json_data)
         # Gửi dữ liệu qua Serial
         ser.write(json_data.encode('utf-8'))
         print(f"Dữ liệu đã gửi: {json_data}")
 
-        # Chờ dựa trên max_duration
-        time.sleep(max_duration / 1000 + 1)
-
+        # Chờ dựa trên max_duration và motor_delay
+        time.sleep(max_duration / 1000 + float(motor_delay))
+        
         if ser.in_waiting > 0:
             response = ser.readline().decode('utf-8').strip()
             print(f"Phản hồi từ ESP32: {response}")
@@ -100,26 +95,49 @@ class RunExpController:
     def send_motor_command_from_request():
         if request.method == 'POST':
             try:
-                motor_data = request.json  # This is now expected to be a list of motor commands
-                grp_data = group_dicts_by_order(motor_data)
-                print("lalalaa", grp_data)
+                print('hạahaha', request.json)
+                motor_data = request.json['listings']  # This is now expected to be a list of motor commands
+                motor_type = request.json['type']  # This is now expected to be a list of motor commands
+                motor_delay = None
 
-                # Check if motor_data is a list
-                if isinstance(grp_data, list):
-                    responses = []
+                if motor_type == 'Simultaneous':
+                    grp_data = group_dicts_by_order(motor_data)
+                    print("@@@@@@", grp_data)
+                    if isinstance(grp_data, list):
+                        responses = []
+                        max_durations = get_max_duration(grp_data)
+                        for idx, item in enumerate(grp_data):
+                            send_motor_command(item, max_durations[idx], 0)  # No delay for Simultaneous type
+                            responses.append({
+                                'message': f'Motor command sent to node_number'
+                            })
+                        return jsonify(responses), 200
+                    else:
+                        return jsonify({'error': 'Invalid request method'}), 405
+                elif motor_type == 'Serial':
+                    item = {
+                        'type': motor_type,
+                        'motor_pins': [convert_node_number(pin) for pin in motor_data if convert_node_number(pin) is not None],
+                        'vibrationTime': request.json['duration']*1000,
+                        'delayBetweenMotors': request.json['delay']*1000
+                    }
+                    timeSleep = math.ceil(item['vibrationTime']*len(item['motor_pins']) + item['delayBetweenMotors']*(len(item['motor_pins']) - 1))
+                    send_motor_command(item, timeSleep, 1)  # No delay for Simultaneous type
+
+
+                else:
+                    motor_delay = request.json['delay']
+                    grp_data = wrap_in_list(transform_motor_data(motor_data))
                     max_durations = get_max_duration(grp_data)
+                    print('lalalala', grp_data)
+                    responses = []
                     for idx, item in enumerate(grp_data):
-                        # Send the motor command with the max duration for the group
-                        send_motor_command(item, max_durations[idx])
-
-                        # Collecting success response
+                        send_motor_command(item, max_durations[idx], motor_delay)
                         responses.append({
                             'message': f'Motor command sent to node_number'
                         })
-
                     return jsonify(responses), 200
-                else:
-                    return jsonify({'error': 'Invalid data format. Expected a list of motor commands.'}), 400
+                    
 
             except Exception as e:
                 print(e)
