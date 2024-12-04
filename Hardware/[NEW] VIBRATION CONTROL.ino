@@ -14,10 +14,8 @@ int numNodes = 0;       // Actual number of nodes
 // Variables for motor control (from second code)
 int motorPins[10];            // Array to hold motor GPIO pins (max 10)
 int numMotors = 0;            // Number of motors
-int vibrationTime = 250;      // Vibration time for each motor
 int delayBetweenMotors = 50;  // Delay between each motor
 
-// Function to get the maximum Duration (from first code)
 int getMaxDuration() {
     int maxDuration = 0;
     for (int i = 0; i < numNodes; i++) {
@@ -104,7 +102,7 @@ void loop() {
             }
 
         } else if (doc.is<JsonObject>()) {
-            // If it's a JSON object, execute logic from the second code
+            // If it's a JSON object, execute updated logic
             JsonObject obj = doc.as<JsonObject>();
 
             // Extract the "type" field
@@ -112,22 +110,40 @@ void loop() {
             if (type && strcmp(type, "Serial") == 0) { // Check if type == "Serial"
                 // Extract data
                 JsonArray pinsArray = obj["motor_pins"];
-                vibrationTime = obj["vibrationTime"];
+                JsonArray vibrationTimesArray = obj["vibrationTime"];
+                JsonArray intensityArray = obj["vibrationIntensity"];
                 delayBetweenMotors = obj["delayBetweenMotors"];
 
-                // Store pins and configure them as OUTPUT
+                // Validate sizes of arrays
                 numMotors = pinsArray.size();
+                if (vibrationTimesArray.size() != numMotors || intensityArray.size() != numMotors) {
+                    Serial.println("Error: Array sizes for motor_pins, vibrationTime, and intensity must match.");
+                    return;
+                }
+
+                // Store pins and configure them as OUTPUT
                 for (int i = 0; i < numMotors; i++) {
                     motorPins[i] = pinsArray[i];
                     pinMode(motorPins[i], OUTPUT);
-                    digitalWrite(motorPins[i], LOW); // Turn off motors initially
+                    analogWrite(motorPins[i], 0); // Turn off motors initially
                 }
 
-                // Activate motors sequentially
+                // Activate motors sequentially with specified vibration time and intensity
                 for (int i = 0; i < numMotors; i++) {
-                    digitalWrite(motorPins[i], HIGH); // Turn on current motor
+                    int motorPin = motorPins[i];
+                    int vibrationTime = vibrationTimesArray[i];
+                    int intensity = intensityArray[i];
+
+                    analogWrite(motorPin, intensity); // Set motor intensity
+                    Serial.print("Motor ");
+                    Serial.print(motorPin);
+                    Serial.print(" turned on with intensity ");
+                    Serial.print(intensity);
+                    Serial.print(" for duration ");
+                    Serial.println(vibrationTime);
+
                     delay(vibrationTime);             // Vibrate for specified time
-                    digitalWrite(motorPins[i], LOW);  // Turn off motor
+                    analogWrite(motorPin, 0);         // Turn off motor
                     delay(delayBetweenMotors);        // Wait before next motor
                 }
 
