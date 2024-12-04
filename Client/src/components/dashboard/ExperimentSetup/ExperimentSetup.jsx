@@ -126,16 +126,19 @@ export const ExperimentSetup = () => {
         payload.delay = delay;
       }
   
-      if (type !== null && delayPerNode !== undefined && delaySerial !== undefined) {
+      if (type !== null && delayPerNode !== undefined) {
         // Transform `listings` to only include `node` values
         const transformedListings = listings.map(item => item.node);
+        const transformedDurations = listings.map(item => item.duration);
+        const transformedIntensities = listings.map(item => item.intensity);
   
         payload.listings = transformedListings; // Replace listings with transformed array
-        payload.duration = parseFloat(delaySerial); // Ensure it's a number
+        payload.duration = transformedDurations; // Ensure it's a number
+        payload.intensity = transformedIntensities; // Ensure it's a number
         payload.delay = parseFloat(delayPerNode);   // Ensure it's a number
         payload.type = type;
       }
-  
+      console.log("yayayaa", payload)
       const response = await runExp(payload);
       console.log(response.data);
       // setListingsNode(response.data);
@@ -208,7 +211,7 @@ export const ExperimentSetup = () => {
 
         {/* Sequential and Simultaneous Buttons */}
         <div className="flex justify-between mt-4">
-          <Button
+          {/* <Button
             onClick={handleSequential}
             className={`w-1/2 py-2 mr-2 rounded transition-all duration-200 ${
               type === "Sequential"
@@ -217,6 +220,16 @@ export const ExperimentSetup = () => {
             }`}
           >
             Sequential
+          </Button> */}
+           <Button
+            onClick={handleSerial}
+            className={`w-1/2 py-2 ml-2 rounded transition-all duration-200 ${
+              type === "Serial"
+                ? "bg-blue-800 text-white shadow-md"
+                : "bg-gray-400 text-gray-700 hover:bg-gray-300 hover:text-white"
+            }`}
+          >
+            Serial
           </Button>
           <Button
             onClick={handleSimultaneous}
@@ -228,16 +241,7 @@ export const ExperimentSetup = () => {
           >
             Simultaneous
           </Button>
-          <Button
-            onClick={handleSerial}
-            className={`w-1/2 py-2 ml-2 rounded transition-all duration-200 ${
-              type === "Serial"
-                ? "bg-blue-800 text-white shadow-md"
-                : "bg-gray-400 text-gray-700 hover:bg-gray-300 hover:text-white"
-            }`}
-          >
-            Serial
-          </Button>
+         
         </div>
 
         {openSeq ? (
@@ -275,7 +279,7 @@ export const ExperimentSetup = () => {
   </div>
 ) : openSerial ? (
   <>
-    <div className="my-4">
+    {/* <div className="my-4">
       <label className="block text-lg font-medium text-gray-700 mb-2">
         Duration (0 - 15): {delaySerial}
       </label>
@@ -307,7 +311,7 @@ export const ExperimentSetup = () => {
           }}
         />
       </div>
-    </div>
+    </div> */}
     <div className="my-4">
       <label className="block text-lg font-medium text-gray-700 mb-2">
         Delay between nodes (0 - 15): {delayPerNode}

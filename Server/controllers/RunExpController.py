@@ -118,10 +118,11 @@ class RunExpController:
                     item = {
                         'type': motor_type,
                         'motor_pins': [convert_node_number(pin) for pin in motor_data if convert_node_number(pin) is not None],
-                        'vibrationTime': request.json['duration']*1000,
+                        'vibrationTime': [d * 1000 for d in request.json['duration']],
+                        'vibrationIntensity': request.json['intensity'],
                         'delayBetweenMotors': request.json['delay']*1000
                     }
-                    timeSleep = math.ceil(item['vibrationTime']*len(item['motor_pins']) + item['delayBetweenMotors']*(len(item['motor_pins']) - 1))
+                    timeSleep = math.ceil( sum(item['vibrationTime']) + item['delayBetweenMotors'] * (len(item['motor_pins']) - 1))
                     send_motor_command(item, timeSleep, 1)  # No delay for Simultaneous type
 
 

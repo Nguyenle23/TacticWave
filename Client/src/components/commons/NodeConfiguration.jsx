@@ -41,7 +41,8 @@ export const NodeConfiguration = ({
 
       <div className="space-y-6">
         {/* Intensity Slider */}
-      <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}>
+      {/* <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}> */}
+      <div>
         <label className="block text-lg font-medium text-gray-700 mb-2">
           Intensity (0 - 255): {intensity}
         </label>
@@ -51,7 +52,7 @@ export const NodeConfiguration = ({
             min="0"
             max="255"
             value={intensity}
-            disabled={isSerial}
+            // disabled={isSerial}
             onChange={(e) => setIntensity(e.target.value)}
             className="w-full h-2 rounded-lg appearance-none cursor-pointer
                         focus:outline-none focus:ring-0
@@ -76,7 +77,8 @@ export const NodeConfiguration = ({
       </div>
 
       {/* Duration Slider */}
-      <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}>
+      {/* <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}> */}
+      <div>
         <label className="block text-lg font-medium text-gray-700 mb-2">
           Duration (0 - 15 seconds): {duration}
         </label>
@@ -86,7 +88,8 @@ export const NodeConfiguration = ({
             min="0"
             max="15"
             value={duration}
-            disabled={isSerial}
+            step={isSerial ? 0.1 : 1}
+            // disabled={isSerial}
             onChange={(e) => setDuration(e.target.value)}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
                         focus:outline-none focus:ring-0
