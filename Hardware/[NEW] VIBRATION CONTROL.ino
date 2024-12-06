@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h> // Include ArduinoJson library
 
-// Structure to store information for each node (from first code)
+// Structure to store information for each node
 struct NodeInfo {
     int Node_number;
     int Intensity;
@@ -11,10 +11,15 @@ struct NodeInfo {
 NodeInfo nodeInfos[10]; // Array to store up to 10 NodeInfo
 int numNodes = 0;       // Actual number of nodes
 
-// Variables for motor control (from second code)
+// Variables for motor control
 int motorPins[10];            // Array to hold motor GPIO pins (max 10)
-int numMotors = 0;            // Number of motors
-int delayBetweenMotors = 50;  // Delay between each motor
+unsigned long activeDurations[10]; // Durations for each motor
+unsigned long startTimes[10];  // Start times for motors
+bool motorActive[10] = {false}; // Motor activity status
+unsigned long lastActivationTime = 0; // Last time a motor was activated
+int nextMotorToActivate = 0;   // Next motor to activate
+int numMotors = 0;             // Number of motors
+unsigned long delayBetweenMotors = 2000; // Delay between motor activations
 
 int getMaxDuration() {
     int maxDuration = 0;
@@ -31,35 +36,151 @@ void setup() {
     Serial.println("ESP32 is ready to control motors.");
 }
 
+void handleSerialType(JsonObject obj) {
+    JsonArray pinsArray = obj["motor_pins"];
+    JsonArray vibrationTimesArray = obj["vibrationTime"];
+    JsonArray intensityArray = obj["vibrationIntensity"];
+    delayBetweenMotors = obj["delayBetweenMotors"];
+
+    numMotors = pinsArray.size();
+
+    if (vibrationTimesArray.size() != numMotors || intensityArray.size() != numMotors) {
+        Serial.println("Error: Array sizes for motor_pins, vibrationTime, and intensity must match.");
+        return;
+    }
+
+    for (int i = 0; i < numMotors; i++) {
+        motorPins[i] = pinsArray[i];
+        activeDurations[i] = vibrationTimesArray[i];
+        pinMode(motorPins[i], OUTPUT);
+        analogWrite(motorPins[i], 0); // Ensure motors start off
+    }
+
+    for (int i = 0; i < numMotors; i++) {
+        int motorPin = motorPins[i];
+        int intensity = intensityArray[i];
+        unsigned long vibrationTime = activeDurations[i];
+
+        analogWrite(motorPin, intensity);
+        Serial.print("Motor ");
+        Serial.print(motorPin);
+        Serial.print(" turned on with intensity ");
+        Serial.print(intensity);
+        Serial.print(" for duration ");
+        Serial.println(vibrationTime);
+
+        delay(vibrationTime);
+        analogWrite(motorPin, 0); // Turn off motor
+        delay(delayBetweenMotors);
+    }
+}
+
+void handleOverlapType(JsonObject obj) {
+    JsonArray pinsArray = obj["motorPins"];
+    JsonArray durationsArray = obj["activeDurations"];
+    JsonArray intensityArray = obj["activeIntensity"];
+    delayBetweenMotors = obj["delayBetweenMotors"];
+    Serial.print("Delay between motors: ");
+    Serial.println(delayBetweenMotors);
+    numMotors = pinsArray.size(); 
+
+    if (durationsArray.size() != numMotors) {
+        Serial.println("Error: activeDurations size must match motorPins size.");
+        return;
+    }
+
+    // Setup motors
+    for (int i = 0; i < numMotors; i++) {
+        motorPins[i] = pinsArray[i];
+        activeDurations[i] = durationsArray[i];
+        ledcSetup(i, 5000, 8); // Set up PWM channel
+        ledcAttachPin(motorPins[i], i);
+        ledcWrite(i, 0); // Ensure motors start off
+        Serial.print("Motor ");
+        Serial.print(motorPins[i]);
+        Serial.println(" setup for PWM.");
+    }
+
+    // Initialize variables for motor control
+    unsigned long lastActivationTime = millis();
+    unsigned long startTimes[10] = {0};  // Start times for motors
+    bool motorActive[10] = {false};      // Motor activity status
+    int nextMotorToActivate = 0;         // Next motor to activate
+
+    while (true) {
+        unsigned long currentMillis = millis();
+
+        // Activate the next motor after delayBetweenMotors
+        if ((currentMillis - lastActivationTime >= delayBetweenMotors || nextMotorToActivate == 0) && nextMotorToActivate < numMotors) {
+            motorActive[nextMotorToActivate] = true;
+            startTimes[nextMotorToActivate] = currentMillis;
+            lastActivationTime = currentMillis;
+            Serial.print("Activating motor ");
+            Serial.println(motorPins[nextMotorToActivate]);
+            nextMotorToActivate++;
+        }
+
+        // Handle the state of each motor
+        for (int i = 0; i < numMotors; i++) {
+            if (motorActive[i]) {
+                if (currentMillis - startTimes[i] < activeDurations[i]) {
+                    ledcWrite(i, intensityArray[i]); // Motor is active
+                    // Optional: Uncomment to see continuous activity logs
+                    // Serial.print("Motor ");
+                    // Serial.print(motorPins[i]);
+                    // Serial.println(" is active.");
+                } else {
+                    ledcWrite(i, 0); // Turn off motor
+                    motorActive[i] = false;
+                    Serial.print("Motor ");
+                    Serial.print(motorPins[i]);
+                    Serial.println(" turned off.");
+                }
+            }
+        }
+
+        // Check if all motors have been processed
+        bool allMotorsProcessed = true;
+        for (int i = 0; i < numMotors; i++) {
+            if (motorActive[i]) {
+                allMotorsProcessed = false;
+                break;
+            }
+        }
+
+        if (nextMotorToActivate >= numMotors && allMotorsProcessed) {
+            Serial.println("All motors processed.");
+            break; // Exit the loop
+        }
+
+        // Small delay to prevent the loop from hogging the CPU
+        delay(10);
+    }
+}
+
+
+
 void loop() {
     if (Serial.available() > 0) {
-        // Read the input string from Serial
         String input = Serial.readStringUntil('\n');
         Serial.print("Received: ");
         Serial.println(input);
 
-        // Initialize JSON document
-        const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(10) + 512; // Adjusted size
-        DynamicJsonDocument doc(capacity); // Use DynamicJsonDocument for flexibility
+        const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(10) + 512;
+        DynamicJsonDocument doc(capacity);
 
-        // Parse the JSON
         DeserializationError error = deserializeJson(doc, input);
-
         if (error) {
             Serial.print("JSON parse failed: ");
             Serial.println(error.c_str());
             return;
         }
 
-        // Check the content of the JSON
         if (doc.is<JsonArray>()) {
-            // If it's a JSON array, execute logic from the first code
             JsonArray arr = doc.as<JsonArray>();
-
-            // Store data from JSON into NodeInfo array
-            numNodes = 0; // Reset number of nodes
+            numNodes = 0;
             for (JsonObject obj : arr) {
-                if (numNodes < 10) { // Ensure we don't exceed array size
+                if (numNodes < 10) {
                     nodeInfos[numNodes].Node_number = obj["Node_number"];
                     nodeInfos[numNodes].Intensity = obj["Intensity"];
                     nodeInfos[numNodes].Duration = obj["Duration"];
@@ -70,13 +191,11 @@ void loop() {
                 }
             }
 
-            // Set all nodes as OUTPUT and ensure they start in the OFF state
             for (int i = 0; i < numNodes; i++) {
                 pinMode(nodeInfos[i].Node_number, OUTPUT);
-                analogWrite(nodeInfos[i].Node_number, 0); // Set initial intensity to 0
+                analogWrite(nodeInfos[i].Node_number, 0);
             }
 
-            // Turn on all nodes at the same time with corresponding intensity
             for (int i = 0; i < numNodes; i++) {
                 analogWrite(nodeInfos[i].Node_number, nodeInfos[i].Intensity);
                 Serial.print("Node ");
@@ -85,72 +204,28 @@ void loop() {
                 Serial.println(nodeInfos[i].Intensity);
             }
 
-            // Get the maximum Duration
             int maxDuration = getMaxDuration();
             Serial.print("Maximum Duration: ");
             Serial.println(maxDuration);
 
-            // Add delay after turning on all nodes
             delay(maxDuration);
 
-            // Turn off all nodes after delay
             for (int i = 0; i < numNodes; i++) {
-                analogWrite(nodeInfos[i].Node_number, 0); // Turn off node
+                analogWrite(nodeInfos[i].Node_number, 0);
                 Serial.print("Node ");
                 Serial.print(nodeInfos[i].Node_number);
                 Serial.println(" turned off.");
             }
-
         } else if (doc.is<JsonObject>()) {
-            // If it's a JSON object, execute updated logic
             JsonObject obj = doc.as<JsonObject>();
-
-            // Extract the "type" field
             const char* type = obj["type"];
-            if (type && strcmp(type, "Serial") == 0) { // Check if type == "Serial"
-                // Extract data
-                JsonArray pinsArray = obj["motor_pins"];
-                JsonArray vibrationTimesArray = obj["vibrationTime"];
-                JsonArray intensityArray = obj["vibrationIntensity"];
-                delayBetweenMotors = obj["delayBetweenMotors"];
-
-                // Validate sizes of arrays
-                numMotors = pinsArray.size();
-                if (vibrationTimesArray.size() != numMotors || intensityArray.size() != numMotors) {
-                    Serial.println("Error: Array sizes for motor_pins, vibrationTime, and intensity must match.");
-                    return;
-                }
-
-                // Store pins and configure them as OUTPUT
-                for (int i = 0; i < numMotors; i++) {
-                    motorPins[i] = pinsArray[i];
-                    pinMode(motorPins[i], OUTPUT);
-                    analogWrite(motorPins[i], 0); // Turn off motors initially
-                }
-
-                // Activate motors sequentially with specified vibration time and intensity
-                for (int i = 0; i < numMotors; i++) {
-                    int motorPin = motorPins[i];
-                    int vibrationTime = vibrationTimesArray[i];
-                    int intensity = intensityArray[i];
-
-                    analogWrite(motorPin, intensity); // Set motor intensity
-                    Serial.print("Motor ");
-                    Serial.print(motorPin);
-                    Serial.print(" turned on with intensity ");
-                    Serial.print(intensity);
-                    Serial.print(" for duration ");
-                    Serial.println(vibrationTime);
-
-                    delay(vibrationTime);             // Vibrate for specified time
-                    analogWrite(motorPin, 0);         // Turn off motor
-                    delay(delayBetweenMotors);        // Wait before next motor
-                }
-
+            if (type && strcmp(type, "Serial") == 0) {
+                handleSerialType(obj);
+            } else if (type && strcmp(type, "Overlap") == 0) {
+                handleOverlapType(obj);
             } else {
-                Serial.println("Type is not 'Serial'. Logic skipped.");
+                Serial.println("Unknown type or unsupported logic.");
             }
-
         } else {
             Serial.println("Invalid JSON format.");
         }
