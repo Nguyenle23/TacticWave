@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowBigLeft, Send } from "lucide-react";
 import { Button } from "../../commons/Button";
 import { NodeConfiguration } from "../../commons/NodeConfiguration";
 import { runExp } from "../../apis/callAPI";
+import SwitchButton from "../../commons/Switch";
 
 export const ExperimentSetup = () => {
   const [matrixSize, setMatrixSize] = useState(3);
-  const [buttonProperty, setButtonProperty] = useState("");
+  const [buttonProperty, setButtonProperty] = useState(1); // Initialize to default node
   const [intensity, setIntensity] = useState(0);
   const [duration, setDuration] = useState(0);
   const [order, setOrder] = useState(1);
@@ -17,28 +18,35 @@ export const ExperimentSetup = () => {
   const [openSeq, setOpenSeq] = useState(false);
   const [openSerial, setOpenSerial] = useState(false);
   const [delay, setDelay] = useState(undefined);
-  const [delaySerial, setDelaySerial] = useState(undefined);
   const [delayPerNode, setDelayPerNode] = useState(undefined);
+
+  // Update buttonProperty when matrixSize changes
+  useEffect(() => {
+    setButtonProperty(null);
+  }, [matrixSize]);
 
   const getSliderBackground = (value, max) => {
     const percentage = (value / max) * 100;
     return `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${percentage}%, #E5E7EB ${percentage}%, #E5E7EB 100%)`;
   };
 
+  const handleSwitchChange = (newState) => {
+    setType(newState ? "Overlap" : "Serial");
+  };
 
   const saveAndOut = () => {
     if (!openSerial && (!intensity || !duration)) {
       setError("Please fill out all required fields!");
       return;
     }
-  
+
     const newListing = {
       node: buttonProperty,
       intensity: parseInt(intensity, 10) || 0, // Default to 0 if empty
-      duration: parseInt(duration, 10) || 0, // Default to 0 if empty
+      duration: parseFloat(duration, 10) || 0, // Default to 0 if empty
       order: order,
     };
-  
+
     // Update listings to highlight saved nodes
     setListings((prevListings) => {
       const updatedListings = [...prevListings];
@@ -52,15 +60,15 @@ export const ExperimentSetup = () => {
       }
       return updatedListings;
     });
-  
-    setButtonProperty("");
+
+    // Reset fields after saving
+    setButtonProperty(0); // Reset to default node if needed
     setIntensity(0);
     setDuration(0);
     setOrder(order);
   };
-  
 
-  // Matrix orders state
+  // Initialize matrix orders
   const initialOrders = {};
   for (let row = 0; row < matrixSize; row++) {
     for (let col = 0; col < matrixSize; col++) {
@@ -91,12 +99,6 @@ export const ExperimentSetup = () => {
     setDuration(0);
   };
 
-  const handleSequential = () => {
-    setOpenSeq(true);
-    setOpenSerial(false);
-    setType("Sequential");
-  };
-
   const handleSimultaneous = () => {
     setOpenSeq(false);
     setOpenSerial(false);
@@ -120,38 +122,36 @@ export const ExperimentSetup = () => {
         listings,
         type,
       };
-  
-      // Add `delay` if it is not undefined
+
+      // Add delay if it is not undefined
       if (delay !== undefined) {
         payload.delay = delay;
       }
-  
+
       if (type !== null && delayPerNode !== undefined) {
-        // Transform `listings` to only include `node` values
-        const transformedListings = listings.map(item => item.node);
-        const transformedDurations = listings.map(item => item.duration);
-        const transformedIntensities = listings.map(item => item.intensity);
-  
+        // Transform listings to only include node values
+        const transformedListings = listings.map((item) => item.node);
+        const transformedDurations = listings.map((item) => item.duration);
+        const transformedIntensities = listings.map((item) => item.intensity);
+
         payload.listings = transformedListings; // Replace listings with transformed array
         payload.duration = transformedDurations; // Ensure it's a number
         payload.intensity = transformedIntensities; // Ensure it's a number
-        payload.delay = parseFloat(delayPerNode);   // Ensure it's a number
+        payload.delay = parseFloat(delayPerNode); // Ensure it's a number
         payload.type = type;
       }
-      console.log("yayayaa", payload)
+      console.log("Payload:", payload);
       const response = await runExp(payload);
-      console.log(response.data);
+      // console.log("Response:", response.data);
       // setListingsNode(response.data);
     } catch (error) {
       console.error("Error running experiment:", error);
     }
   };
-  
-  
+
   return (
-    <div className="flex flex-col md:flex-row w-full h-fit bg-gray-100">
-      {/* Main content area */}
-      <div className="md:w-3/4 p-3">
+    <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
+      <div className="md:w-2/5 w-full">
         {/* Top navigation and action buttons */}
         <div className="flex items-center justify-between mb-2">
           <Link
@@ -160,12 +160,8 @@ export const ExperimentSetup = () => {
           >
             <ArrowBigLeft />
           </Link>
-          <h2 className="text-lg font-semibold">
-            Matrix Size: {matrixSize}x{matrixSize}
-          </h2>
         </div>
 
-        {/* Dropdown for matrix size */}
         <div className="mb-4">
           <label htmlFor="matrix-size" className="mr-2 text-lg font-medium">
             Select Matrix Size:
@@ -181,7 +177,8 @@ export const ExperimentSetup = () => {
             <option value="5">5x5</option>
           </select>
         </div>
-        {/* <p>{JSON.stringify(listings)}</p> */}
+        {/* <p>{JSON.stringify(type)}</p> */}
+
         {/* Matrix Display */}
         <div
           className={`grid grid-cols-${matrixSize} gap-4 mt-1`}
@@ -199,7 +196,7 @@ export const ExperimentSetup = () => {
                   className={`w-full h-16 rounded-3xl flex items-center justify-center text-2xl font-bold transition-all duration-200 ${
                     buttonProperty === node || isNodeSaved(node)
                       ? "bg-blue-800 text-white shadow-md"
-                      : "bg-gray-400 text-gray-600 hover:bg-gray-300"
+                      : "bg-white text-black hover:bg-gray-300 border-2 border-solid border-black"
                   }`}
                 >
                   {node}
@@ -209,147 +206,6 @@ export const ExperimentSetup = () => {
           )}
         </div>
 
-        {/* Sequential and Simultaneous Buttons */}
-        <div className="flex justify-between mt-4">
-          {/* <Button
-            onClick={handleSequential}
-            className={`w-1/2 py-2 mr-2 rounded transition-all duration-200 ${
-              type === "Sequential"
-                ? "bg-blue-800 text-white shadow-md"
-                : "bg-gray-400 text-gray-700 hover:bg-gray-300 hover:text-white"
-            }`}
-          >
-            Sequential
-          </Button> */}
-           <Button
-            onClick={handleSerial}
-            className={`w-1/2 py-2 ml-2 rounded transition-all duration-200 ${
-              type === "Serial"
-                ? "bg-blue-800 text-white shadow-md"
-                : "bg-gray-400 text-gray-700 hover:bg-gray-300 hover:text-white"
-            }`}
-          >
-            Serial
-          </Button>
-          <Button
-            onClick={handleSimultaneous}
-            className={`w-1/2 py-2 ml-2 rounded transition-all duration-200 ${
-              type === "Simultaneous"
-                ? "bg-blue-800 text-white shadow-md"
-                : "bg-gray-400 text-gray-700 hover:bg-gray-300 hover:text-white"
-            }`}
-          >
-            Simultaneous
-          </Button>
-         
-        </div>
-
-        {openSeq ? (
-  <div className="my-4">
-    <label className="block text-lg font-medium text-gray-700 mb-2">
-      Duration (0 - 15): {delay}
-    </label>
-    <div className="relative">
-      <input
-        type="range"
-        min="0"
-        max="15"
-        value={delay}
-        onChange={(e) => setDelay(e.target.value)}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                    focus:outline-none focus:ring-0
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                    [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
-                    [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                    [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                    [&::-webkit-slider-thumb]:hover:scale-110
-                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
-                    [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
-                    [&::-moz-range-thumb]:border-0 
-                    [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
-                    [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                    [&::-moz-range-thumb]:hover:scale-110
-                    [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
-                    [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
-        style={{
-          background: getSliderBackground(delay, 15),
-        }}
-      />
-    </div>
-  </div>
-) : openSerial ? (
-  <>
-    {/* <div className="my-4">
-      <label className="block text-lg font-medium text-gray-700 mb-2">
-        Duration (0 - 15): {delaySerial}
-      </label>
-      <div className="relative">
-        <input
-          type="range"
-          min="0"
-          max="15"
-          step="0.1"
-          value={delaySerial}
-          onChange={(e) => setDelaySerial(e.target.value)}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                      focus:outline-none focus:ring-0
-                      [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                      [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
-                      [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                      [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                      [&::-webkit-slider-thumb]:hover:scale-110
-                      [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
-                      [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
-                      [&::-moz-range-thumb]:border-0 
-                      [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
-                      [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                      [&::-moz-range-thumb]:hover:scale-110
-                      [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
-                      [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
-          style={{
-            background: getSliderBackground(delaySerial, 15),
-          }}
-        />
-      </div>
-    </div> */}
-    <div className="my-4">
-      <label className="block text-lg font-medium text-gray-700 mb-2">
-        Delay between nodes (0 - 15): {delayPerNode}
-      </label>
-      <div className="relative">
-        <input
-          type="range"
-          min="0"
-          max="15"
-          step="0.1"
-          value={delayPerNode}
-          onChange={(e) => setDelayPerNode(e.target.value)}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                      focus:outline-none focus:ring-0
-                      [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                      [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
-                      [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                      [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                      [&::-webkit-slider-thumb]:hover:scale-110
-                      [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
-                      [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
-                      [&::-moz-range-thumb]:border-0 
-                      [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
-                      [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                      [&::-moz-range-thumb]:hover:scale-110
-                      [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
-                      [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
-          style={{
-            background: getSliderBackground(delayPerNode, 15),
-          }}
-        />
-      </div>
-    </div>
-  </>
-) : null}
-
-
-
         {/* Submit Button */}
         <div className="mt-4 flex items-center justify-center w-full">
           <Button
@@ -357,29 +213,156 @@ export const ExperimentSetup = () => {
             className="w-full px-8 py-6 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white text-2xl font-bold rounded-full shadow-md hover:shadow-lg hover:from-green-500 hover:to-green-700 flex items-center justify-center transition-all duration-300"
           >
             <Send size={30} className="mr-3" />
-            Submit All Feedback
+            Activating Vibration Motor
           </Button>
         </div>
+        {/* Sequential and Simultaneous Buttons */}
       </div>
 
-      {/* Node Configuration Modal */}
-      {buttonProperty &&  (
-        <NodeConfiguration
-          isSerial = {openSerial}
-          isEdit={false}
-          nodeNumber={buttonProperty}
-          intensity={intensity}
-          setIntensity={setIntensity}
-          duration={duration}
-          setDuration={setDuration}
-          order={order}
-          setOrder={setOrder}
-          listings={listings}
-          onClose={() => setButtonProperty(null)}
-          onSave={saveAndOut}
-          error={error}
-        />
-      )}
+      <div className="md:w-3/5 w-full flex flex-col">
+        <div className="flex justify-between items-start p-6">
+          {/* Phần "hello" bên trái */}
+          <div className="w-4/12">
+            <h1 className="text-2xl font-bold mb-2">Demographic</h1>
+            <p className="text-gray-700">
+              Select the type of signal that you wish to receive.
+            </p>
+          </div>
+
+          {/* Phần bên phải theo cột */}
+          <div className="w-6/12 flex flex-col space-y-4">
+            {/* Nhóm Nút "Serial" và "Simultaneous" */}
+            <h1 className="text-xl font-bold mb-2">Tactile</h1>
+            <div className="flex space-x-2">
+              <Button
+                onClick={handleSerial}
+                className={`w-1/2 py-2 rounded transition-all duration-200 ${
+                  type === "Serial" || type === "Overlap"
+                    ? "bg-blue-800 text-white shadow-md"
+                    : "bg-white border-2 border-solid border-black  hover:bg-gray-300 hover:text-black"
+                }`}
+              >
+                Serial
+              </Button>
+              <Button
+                onClick={handleSimultaneous}
+                className={`w-1/2 py-2 rounded transition-all duration-200 ${
+                  type === "Simultaneous"
+                    ? "bg-blue-800 text-white shadow-md"
+                    : "bg-white border-2 border-solid border-black  hover:bg-gray-300 hover:text-black"
+                }`}
+              >
+                Simultaneous
+              </Button>
+            </div>
+
+            {/* Các thành phần điều kiện khi chọn Serial hoặc Overlap */}
+            {(openSeq || openSerial) && (
+              <div className="flex flex-col space-y-4">
+                {openSeq && (
+                  <div>
+                    <label className="block text-lg font-medium text-gray-700 mb-2">
+                      Duration (0 - 15): {delay}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="range"
+                        min="0"
+                        max="15"
+                        value={delay}
+                        onChange={(e) => setDelay(e.target.value)}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                               focus:outline-none focus:ring-0
+                               [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                               [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
+                               [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                               [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                               [&::-webkit-slider-thumb]:hover:scale-110
+                               [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
+                               [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
+                               [&::-moz-range-thumb]:border-0 
+                               [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
+                               [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                               [&::-moz-range-thumb]:hover:scale-110
+                               [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
+                               [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
+                        style={{
+                          background: getSliderBackground(delay, 15),
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {openSerial && (
+                  <>
+                    <SwitchButton
+                      isOn={type === "Overlap"}
+                      onSwitchChange={handleSwitchChange}
+                    />
+
+                    <div>
+                      <label className="block text-lg font-medium text-gray-700 mb-2">
+                        Delay between nodes (0 - 15): {delayPerNode}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="range"
+                          min="0"
+                          max="15"
+                          step="0.1"
+                          value={delayPerNode}
+                          onChange={(e) => setDelayPerNode(e.target.value)}
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                                 focus:outline-none focus:ring-0
+                                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                                 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
+                                 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                                 [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                                 [&::-webkit-slider-thumb]:hover:scale-110
+                                 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
+                                 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
+                                 [&::-moz-range-thumb]:border-0 
+                                 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
+                                 [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                                 [&::-moz-range-thumb]:hover:scale-110
+                                 [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
+                                 [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
+                          style={{
+                            background: getSliderBackground(delayPerNode, 15),
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Slider Controls */}
+
+        {buttonProperty && (
+          <div className="flex justify-between items-start p-6">
+            <NodeConfiguration
+              isSerial={openSerial}
+              isEdit={false}
+              nodeNumber={buttonProperty}
+              intensity={intensity}
+              setIntensity={setIntensity}
+              duration={duration}
+              setDuration={setDuration}
+              order={order}
+              setOrder={setOrder}
+              listings={listings}
+              onClose={() => setButtonProperty(1)} // Reset to default node on close
+              onSave={saveAndOut}
+              error={error}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

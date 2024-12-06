@@ -122,9 +122,21 @@ class RunExpController:
                         'vibrationIntensity': request.json['intensity'],
                         'delayBetweenMotors': request.json['delay']*1000
                     }
-                    timeSleep = math.ceil( sum(item['vibrationTime']) + item['delayBetweenMotors'] * (len(item['motor_pins']) - 1))
+                    timeSleep = math.ceil(sum(item['vibrationTime']) + item['delayBetweenMotors'] * (len(item['motor_pins']) - 1))
                     send_motor_command(item, timeSleep, 1)  # No delay for Simultaneous type
 
+                elif motor_type == 'Overlap':
+                    item = {
+                        'type': motor_type,
+                        'motorPins': [convert_node_number(pin) for pin in motor_data if convert_node_number(pin) is not None],
+                        'activeDurations': [d * 1000 for d in request.json['duration']],
+                        'activeIntensity': request.json['intensity'],
+                        'delayBetweenMotors': request.json['delay']*1000
+                    }
+                    timeSleep = max(i * item['delayBetweenMotors'] + duration for i, duration in enumerate(item['activeDurations'])) + 1000
+
+                    send_motor_command(item, timeSleep, 1)  # No delay for Simultaneous type
+                    print("ahihihihi", item)
 
                 else:
                     motor_delay = request.json['delay']
