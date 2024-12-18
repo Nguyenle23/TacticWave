@@ -34,6 +34,10 @@ export const ExperimentSetup = () => {
     setType(newState ? "Overlap" : "Serial");
   };
 
+  const handleReset = () => {
+    setListings([])
+  }
+
   const saveAndOut = () => {
     if (!openSerial && (!intensity || !duration)) {
       setError("Please fill out all required fields!");
@@ -151,8 +155,7 @@ export const ExperimentSetup = () => {
 
   return (
     <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
-      <div className="md:w-2/5 w-full">
-        {/* Top navigation and action buttons */}
+      <div className="md:w-1/3 w-full">
         <div className="flex items-center justify-between mb-2">
           <Link
             to="/"
@@ -162,26 +165,30 @@ export const ExperimentSetup = () => {
           </Link>
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="matrix-size" className="mr-2 text-lg font-medium">
-            Select Matrix Size:
-          </label>
-          <select
-            id="matrix-size"
-            value={matrixSize}
-            onChange={handleMatrixSizeChange}
-            className="p-2 border rounded"
-          >
-            <option value="3">3x3</option>
-            <option value="4">4x4</option>
-            <option value="5">5x5</option>
-          </select>
+        <div className="mb-4 flex justify-between">
+          <div>
+            <label htmlFor="matrix-size" className="mr-2 text-lg font-medium">
+              Select Matrix Size:
+            </label>
+            <select
+              id="matrix-size"
+              value={matrixSize}
+              onChange={handleMatrixSizeChange}
+              className="p-2 border rounded"
+            >
+              <option value="3">3x3</option>
+              <option value="4">4x4</option>
+              <option value="5">5x5</option>
+            </select>
+          </div>
+          <button onClick={handleReset}>Reset Nodes</button>
         </div>
-        {/* <p>{JSON.stringify(type)}</p> */}
+
+        {/* <p>{JSON.stringify(listings)}</p> */}
 
         {/* Matrix Display */}
         <div
-          className={`grid grid-cols-${matrixSize} gap-4 mt-1`}
+          className={`grid grid-cols-${matrixSize} gap-2 mt-1`}
           style={{
             gridTemplateColumns: `repeat(${matrixSize}, minmax(0, 1fr))`,
           }}
@@ -193,9 +200,9 @@ export const ExperimentSetup = () => {
                 <Button
                   key={`${row}-${col}`}
                   onClick={() => handleClick(row, col)}
-                  className={`w-full h-16 rounded-3xl flex items-center justify-center text-2xl font-bold transition-all duration-200 ${
+                  className={`w-full aspect-square rounded-md flex items-center justify-center text-lg font-bold transition-all duration-200 ${
                     buttonProperty === node || isNodeSaved(node)
-                      ? "bg-blue-800 text-white shadow-md"
+                      ? "bg-blue-800 text-white shadow-sm" // Giảm shadow từ shadow-md xuống shadow-sm
                       : "bg-white text-black hover:bg-gray-300 border-2 border-solid border-black"
                   }`}
                 >
