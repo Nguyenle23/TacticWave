@@ -200,7 +200,7 @@ export const ExperimentSetup = () => {
                 <Button
                   key={`${row}-${col}`}
                   onClick={() => handleClick(row, col)}
-                  className={`w-full aspect-square rounded-md flex items-center justify-center text-lg font-bold transition-all duration-200 ${
+                  className={`w-full aspect-square rounded-md flex items-center justify-center text-xl font-bold transition-all duration-200 ${
                     buttonProperty === node || isNodeSaved(node)
                       ? "bg-blue-800 text-white shadow-sm" // Giảm shadow từ shadow-md xuống shadow-sm
                       : "bg-white text-black hover:bg-gray-300 border-2 border-solid border-black"
