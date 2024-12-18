@@ -150,130 +150,7 @@ export const ExperimentSetup = () => {
   };
 
   return (
-    <div className = "flex flex-row md:flex-col">
-      {/* Demographic */}
-      <div className="flex justify-between items-start p-6">
-        {/* Phần "hello" bên trái */}
-        <div className="w-full">
-          <h1 className="text-2xl font-bold mb-2">Demographic</h1>
-          <p className="text-gray-700">
-            Select the type of signal that you wish to receive.
-          </p>
-        </div>
-
-                 {/* Phần bên phải theo cột */}
-                 <div className="w-6/12 flex flex-col space-y-4">
-            {/* Nhóm Nút "Serial" và "Simultaneous" */}
-            <h1 className="text-xl font-bold text-white mb-2">Tactile</h1>
-            <div className="flex space-x-2">
-              <Button
-                onClick={handleSerial}
-                className={`w-1/2 py-2 rounded transition-all duration-200 ${
-                  type === "Serial" || type === "Overlap"
-                    ? "bg-blue-800 text-white shadow-md"
-                    : "bg-white border-2 border-solid border-black  hover:bg-gray-300 hover:text-black"
-                }`}
-              >
-                Serial
-              </Button>
-              <Button
-                onClick={handleSimultaneous}
-                className={`w-1/2 py-2 rounded transition-all duration-200 ${
-                  type === "Simultaneous"
-                    ? "bg-blue-800 text-white shadow-md"
-                    : "bg-white border-2 border-solid border-black  hover:bg-gray-300 hover:text-black"
-                }`}
-              >
-                Simultaneous
-              </Button>
-            </div>
-
-            {/* Các thành phần điều kiện khi chọn Serial hoặc Overlap */}
-            {(openSeq || openSerial) && (
-              <div className="flex flex-col space-y-4">
-                {openSeq && (
-                  <div>
-                    <label className="block text-lg font-medium text-gray-700 mb-2">
-                      Duration (0 - 15): {delay}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="range"
-                        min="0"
-                        max="15"
-                        value={delay}
-                        onChange={(e) => setDelay(e.target.value)}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                               focus:outline-none focus:ring-0
-                               [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                               [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
-                               [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                               [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                               [&::-webkit-slider-thumb]:hover:scale-110
-                               [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
-                               [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
-                               [&::-moz-range-thumb]:border-0 
-                               [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
-                               [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                               [&::-moz-range-thumb]:hover:scale-110
-                               [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
-                               [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
-                        style={{
-                          background: getSliderBackground(delay, 15),
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {openSerial && (
-                  <>
-                    <SwitchButton
-                      isOn={type === "Overlap"}
-                      onSwitchChange={handleSwitchChange}
-                    />
-
-                    <div>
-                      <label className="block text-lg font-medium text-gray-700 mb-2">
-                        Delay between nodes (0 - 15): {delayPerNode}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="0"
-                          max="15"
-                          step="0.1"
-                          value={delayPerNode}
-                          onChange={(e) => setDelayPerNode(e.target.value)}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                                 focus:outline-none focus:ring-0
-                                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                                 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-blue-500 
-                                 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-                                 [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                                 [&::-webkit-slider-thumb]:hover:scale-110
-                                 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
-                                 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-blue-500 
-                                 [&::-moz-range-thumb]:border-0 
-                                 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:cursor-pointer
-                                 [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                                 [&::-moz-range-thumb]:hover:scale-110
-                                 [&::-moz-range-progress]:bg-blue-500 [&::-moz-range-progress]:rounded-l-lg
-                                 [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-lg"
-                          style={{
-                            background: getSliderBackground(delayPerNode, 15),
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-      </div>
-      
-      <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
+    <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
       <div className="md:w-2/5 w-full">
         {/* Top navigation and action buttons */}
         <div className="flex items-center justify-between mb-2">
@@ -343,6 +220,7 @@ export const ExperimentSetup = () => {
       </div>
 
       <div className="md:w-3/5 w-full flex flex-col">
+
         {/* Slider Controls */}
 
         {buttonProperty && (
@@ -366,7 +244,5 @@ export const ExperimentSetup = () => {
         )}
       </div>
     </div>
-    </div>
-
   );
 };

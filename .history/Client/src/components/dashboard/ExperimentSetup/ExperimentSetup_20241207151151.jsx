@@ -150,21 +150,22 @@ export const ExperimentSetup = () => {
   };
 
   return (
-    <div className = "flex flex-row md:flex-col">
-      {/* Demographic */}
-      <div className="flex justify-between items-start p-6">
-        {/* Phần "hello" bên trái */}
-        <div className="w-full">
-          <h1 className="text-2xl font-bold mb-2">Demographic</h1>
-          <p className="text-gray-700">
-            Select the type of signal that you wish to receive.
-          </p>
-        </div>
+    <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
+      <div className = "mt:w-full">
+              {/* Demographic */}
+              <div className="flex justify-between items-start p-6">
+          {/* Phần "hello" bên trái */}
+          <div className="w-4/12">
+            <h1 className="text-2xl font-bold mb-2">Demographic</h1>
+            <p className="text-gray-700">
+              Select the type of signal that you wish to receive.
+            </p>
+          </div>
 
-                 {/* Phần bên phải theo cột */}
-                 <div className="w-6/12 flex flex-col space-y-4">
+          {/* Phần bên phải theo cột */}
+          <div className="w-6/12 flex flex-col space-y-4">
             {/* Nhóm Nút "Serial" và "Simultaneous" */}
-            <h1 className="text-xl font-bold text-white mb-2">Tactile</h1>
+            <h1 className="text-xl font-bold mb-2">Tactile</h1>
             <div className="flex space-x-2">
               <Button
                 onClick={handleSerial}
@@ -271,9 +272,8 @@ export const ExperimentSetup = () => {
               </div>
             )}
           </div>
+        </div>
       </div>
-      
-      <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
       <div className="md:w-2/5 w-full">
         {/* Top navigation and action buttons */}
         <div className="flex items-center justify-between mb-2">
@@ -343,6 +343,7 @@ export const ExperimentSetup = () => {
       </div>
 
       <div className="md:w-3/5 w-full flex flex-col">
+
         {/* Slider Controls */}
 
         {buttonProperty && (
@@ -366,7 +367,5 @@ export const ExperimentSetup = () => {
         )}
       </div>
     </div>
-    </div>
-
   );
 };

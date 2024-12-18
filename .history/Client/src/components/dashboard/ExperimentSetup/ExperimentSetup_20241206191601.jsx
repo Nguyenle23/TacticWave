@@ -150,21 +150,89 @@ export const ExperimentSetup = () => {
   };
 
   return (
-    <div className = "flex flex-row md:flex-col">
-      {/* Demographic */}
-      <div className="flex justify-between items-start p-6">
-        {/* Phần "hello" bên trái */}
-        <div className="w-full">
-          <h1 className="text-2xl font-bold mb-2">Demographic</h1>
-          <p className="text-gray-700">
-            Select the type of signal that you wish to receive.
-          </p>
+    <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
+      <div className="md:w-2/5 w-full">
+        {/* Top navigation and action buttons */}
+        <div className="flex items-center justify-between mb-2">
+          <Link
+            to="/"
+            className="px-6 py-0.5 bg-gray-300 rounded-full mr-2 hover:bg-gray-400"
+          >
+            <ArrowBigLeft />
+          </Link>
         </div>
 
-                 {/* Phần bên phải theo cột */}
-                 <div className="w-6/12 flex flex-col space-y-4">
+        <div className="mb-4">
+          <label htmlFor="matrix-size" className="mr-2 text-lg font-medium">
+            Select Matrix Size:
+          </label>
+          <select
+            id="matrix-size"
+            value={matrixSize}
+            onChange={handleMatrixSizeChange}
+            className="p-2 border rounded"
+          >
+            <option value="3">3x3</option>
+            <option value="4">4x4</option>
+            <option value="5">5x5</option>
+          </select>
+        </div>
+        {/* <p>{JSON.stringify(type)}</p> */}
+
+        {/* Matrix Display */}
+        <div
+          className={`grid grid-cols-${matrixSize} gap-4 mt-1`}
+          style={{
+            gridTemplateColumns: `repeat(${matrixSize}, minmax(0, 1fr))`,
+          }}
+        >
+          {Array.from({ length: matrixSize }).map((_, row) =>
+            Array.from({ length: matrixSize }).map((_, col) => {
+              const node = orders[`${row}-${col}`];
+              return (
+                <Button
+                  key={`${row}-${col}`}
+                  onClick={() => handleClick(row, col)}
+                  className={`w-full h-16 rounded-3xl flex items-center justify-center text-2xl font-bold transition-all duration-200 ${
+                    buttonProperty === node || isNodeSaved(node)
+                      ? "bg-blue-800 text-white shadow-md"
+                      : "bg-white text-black hover:bg-gray-300 border-2 border-solid border-black"
+                  }`}
+                >
+                  {node}
+                </Button>
+              );
+            })
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <div className="mt-4 flex items-center justify-center w-full">
+          <Button
+            onClick={handleSubmit}
+            className="w-full px-8 py-6 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white text-2xl font-bold rounded-full shadow-md hover:shadow-lg hover:from-green-500 hover:to-green-700 flex items-center justify-center transition-all duration-300"
+          >
+            <Send size={30} className="mr-3" />
+            Activating Vibration Motor
+          </Button>
+        </div>
+        {/* Sequential and Simultaneous Buttons */}
+      </div>
+
+      <div className="md:w-3/5 w-full flex flex-col">
+        <div className="flex justify-between items-start p-6">
+          {/* Phần "hello" bên trái */}
+          <div className="w-4/12">
+            <h1 className="text-2xl font-bold mb-2">Demographic</h1>
+            <p className="text-gray-700">
+              Select the type of signal that you wish to receive.
+            </p>
+          </div>
+
+          {/* Phần bên phải theo cột */}
+          <div className="w-6/12 flex flex-col space-y-4">
             {/* Nhóm Nút "Serial" và "Simultaneous" */}
-            <h1 className="text-xl font-bold text-white mb-2">Tactile</h1>
+            <h1 className="text-xl font-bold mb-2">Tactile</h1>
             <div className="flex space-x-2">
               <Button
                 onClick={handleSerial}
@@ -271,78 +339,8 @@ export const ExperimentSetup = () => {
               </div>
             )}
           </div>
-      </div>
-      
-      <div className="flex flex-col md:flex-row w-full h-fit bg-gray-10 gap-8 my-4 px-4">
-      <div className="md:w-2/5 w-full">
-        {/* Top navigation and action buttons */}
-        <div className="flex items-center justify-between mb-2">
-          <Link
-            to="/"
-            className="px-6 py-0.5 bg-gray-300 rounded-full mr-2 hover:bg-gray-400"
-          >
-            <ArrowBigLeft />
-          </Link>
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="matrix-size" className="mr-2 text-lg font-medium">
-            Select Matrix Size:
-          </label>
-          <select
-            id="matrix-size"
-            value={matrixSize}
-            onChange={handleMatrixSizeChange}
-            className="p-2 border rounded"
-          >
-            <option value="3">3x3</option>
-            <option value="4">4x4</option>
-            <option value="5">5x5</option>
-          </select>
-        </div>
-        {/* <p>{JSON.stringify(type)}</p> */}
-
-        {/* Matrix Display */}
-        <div
-          className={`grid grid-cols-${matrixSize} gap-4 mt-1`}
-          style={{
-            gridTemplateColumns: `repeat(${matrixSize}, minmax(0, 1fr))`,
-          }}
-        >
-          {Array.from({ length: matrixSize }).map((_, row) =>
-            Array.from({ length: matrixSize }).map((_, col) => {
-              const node = orders[`${row}-${col}`];
-              return (
-                <Button
-                  key={`${row}-${col}`}
-                  onClick={() => handleClick(row, col)}
-                  className={`w-full h-16 rounded-3xl flex items-center justify-center text-2xl font-bold transition-all duration-200 ${
-                    buttonProperty === node || isNodeSaved(node)
-                      ? "bg-blue-800 text-white shadow-md"
-                      : "bg-white text-black hover:bg-gray-300 border-2 border-solid border-black"
-                  }`}
-                >
-                  {node}
-                </Button>
-              );
-            })
-          )}
-        </div>
-
-        {/* Submit Button */}
-        <div className="mt-4 flex items-center justify-center w-full">
-          <Button
-            onClick={handleSubmit}
-            className="w-full px-8 py-6 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white text-2xl font-bold rounded-full shadow-md hover:shadow-lg hover:from-green-500 hover:to-green-700 flex items-center justify-center transition-all duration-300"
-          >
-            <Send size={30} className="mr-3" />
-            Activating Vibration Motor
-          </Button>
-        </div>
-        {/* Sequential and Simultaneous Buttons */}
-      </div>
-
-      <div className="md:w-3/5 w-full flex flex-col">
         {/* Slider Controls */}
 
         {buttonProperty && (
@@ -366,7 +364,5 @@ export const ExperimentSetup = () => {
         )}
       </div>
     </div>
-    </div>
-
   );
 };

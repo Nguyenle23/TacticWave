@@ -164,7 +164,7 @@ export const ExperimentSetup = () => {
                  {/* Phần bên phải theo cột */}
                  <div className="w-6/12 flex flex-col space-y-4">
             {/* Nhóm Nút "Serial" và "Simultaneous" */}
-            <h1 className="text-xl font-bold text-white mb-2">Tactile</h1>
+            <h1 className="text-xl font-bold mb-2">Tactile</h1>
             <div className="flex space-x-2">
               <Button
                 onClick={handleSerial}
