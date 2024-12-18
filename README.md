@@ -1,58 +1,110 @@
-# TacticWave – Feel the World
-<img src="https://github.com/Nguyenle23/TacticWave/blob/main/Assets/logo.jpg" width="350" height="200" />
+# TactiWave Frontend Setup
 
-## Table of Contents
-- [TacticWave](#tacticwave)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Team](#team)
-  - [Problems Overview](#product-overview)
-    - [Key Features:](#key-features)
-    - [Advanced AI Features:](#advanced-ai-features)
+This guide provides instructions to set up and run the frontend of the **TacticWave** project, which uses **Vite** and **React JS**.
 
-## Introduction
-Welcome, we’re <strong>Ohana</strong>, and we’ve developed an innovative system specifically designed to support individuals who are both deaf and blind: <strong>TacticWave</strong>. Our solution empowers users to perceive and respond to their surroundings by converting spoken language into tactile vibrations felt through a wearable device. By integrating speech-to-text technology, emotion detection, and tactile feedback, we enable real-time communication and enhance safety by identifying urgent messages and emotional cues. In addition, TactiWave offers a unique emergency alert feature that uses specific tactile patterns to signal danger or critical situations, ensuring users can respond promptly to emergencies. With TactiWave, we aim to break down barriers and create a more inclusive world for those facing dual sensory challenges. 
+## Prerequisites
 
-## Team
-Meet the brilliant minds behind TacticWave:
+Ensure you have the following tools installed on your machine:
 
-- **Nguyen Huynh THao My** - Team Leader & 
-  - Task: Business Analysis 
-  - [Contact](https://www.facebook.com/profile.php?id=100028976440230)
+- **Node.js** (version 14.18+ or 16+ is recommended): [Download Node.js](https://nodejs.org/)
+- **npm** (comes with Node.js) or **yarn** (optional):
+  ```bash
+  npm -v  # Check npm version
+  yarn -v # Check yarn version (if using yarn)
+  ```
 
-- **Dang Nguyen Nam Anh** - AI Developer
-  - Task: Voice Recognition, Speech-to-Text
-  - [Contact](https://www.facebook.com/profile.php?id=100016974122598)
+## Clone the Repository
 
-- **Le Nguyen Binh Nguyen** - Hardware and Mobile Developer
-  - Task: ESP32 Development, Flutter
-  - [Contact](https://www.facebook.com/nguyenle23.iu/)
+To get started, clone the repository to your local machine:
 
-- **Pham Duc Dat** - Mobile Developer
-  - Task: Flutter
-  - [Contact](https://www.facebook.com/datbenho84)
+```bash
+git clone https://github.com/Nguyenle23/TacticWave.git
+```
 
-- **Nguyen Hoang Luan** - Mobile Developer
-  - Task: Flutter
-  - [Contact](https://www.facebook.com/luan.nguyen.007)
+Navigate to the project directory:
 
-## Problems Overview
-Approximately 0.2% to 2% of the global population are both deaf and blind, and many struggle daily due to the lack of accessible technology.
+```bash
+cd TacticWave
+```
 
-### Our Solution
-<img src="https://github.com/Nguyenle23/TacticWave/blob/main/Assets/tacticwave.png" width="450" height="300" />
+## Install Dependencies
 
-### Workflow:
-<img src="https://github.com/Nguyenle23/TacticWave/blob/main/Assets/workflow.jpg" width="450" height="300" />
+Install the necessary dependencies using `npm` or `yarn`:
 
-### Key Features:
-- **Real-Time Haptic Communication**: Converts speech and sounds into vibration patterns.
-- **Emergency Alerts**: Automatically activates vibrations upon detecting emergency signals (fire alarms, car horns).
-- **Mobile Integration**: The Mobile app allows users to adjust vibration intensity and patterns.
-- **Alphabet Mode**: Converts text messages into vibrations based on the alphabet.
+### Using npm:
+```bash
+npm install
+```
 
-### Advanced AI Features:
-- **Speech-to-Vibration Conversion**: AI converts speech into vibrations for direct perception by deaf-blind individuals.
-- **Emergency Signal Recognition**: The device automatically detects and responds to environmental signals (such as car horns and fire alarms).
-- **Customizable Vibration Patterns**: Users can adjust vibration patterns and intensity via the mobile app.
+### Using yarn:
+```bash
+yarn install
+```
 
+## Run the Development Server
+
+Start the development server to view the project locally:
+
+### Using npm:
+```bash
+npm run dev
+```
+
+### Using yarn:
+```bash
+yarn dev
+```
+
+After starting, you should see output similar to this:
+
+```
+  VITE v<version>  ready in <time>
+  🌐 Local: http://localhost:5173/
+  📡 Network: http://<your-ip>:5173/
+```
+
+Open your browser and navigate to [http://localhost:5173/](http://localhost:5173/) to view the application.
+
+## Environment Variables
+
+The project may require specific environment variables to run. If an `.env` file is included in the repository, ensure it is configured correctly.
+
+If the `.env` file is missing, you may need to create one in the root directory based on the provided `.env.example` file:
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file to match your environment setup.
+
+## Build for Production
+
+To build the project for production, run:
+
+### Using npm:
+```bash
+npm run build
+```
+
+### Using yarn:
+```bash
+yarn build
+```
+
+The production-ready files will be generated in the `dist/` directory. You can deploy this folder to any static hosting service, such as Netlify, Vercel, or AWS S3.
+
+## Troubleshooting
+
+### Common Issues:
+1. **Missing dependencies**: Ensure you have run `npm install` or `yarn install`.
+2. **Environment issues**: Ensure all required environment variables are set in the `.env` file.
+3. **Port conflict**: If port `5173` is already in use, update the `vite.config.js` or use the following command to specify a different port:
+   ```bash
+   npm run dev -- --port=3000
+   ```
+
+### Need help?
+Feel free to raise an issue in the GitHub repository or reach out to the project maintainers.
+
+## License
+This project is licensed under the terms specified in the repository. Please check the `LICENSE` file for more information.
