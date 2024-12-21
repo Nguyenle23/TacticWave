@@ -37,8 +37,6 @@ export const NodeConfiguration = ({
       </div>
 
       <div className="w-6/12 flex flex-col space-y-4">
-        {/* Intensity Slider */}
-        {/* <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}> */}
         <div>
           <label className="block text-lg font-medium text-gray-700 mb-2">
             Intensity (0 - 255): {intensity}
@@ -49,7 +47,6 @@ export const NodeConfiguration = ({
               min="0"
               max="255"
               value={intensity}
-              // disabled={isSerial}
               onChange={(e) => setIntensity(e.target.value)}
               className="w-full h-2 rounded-lg appearance-none cursor-pointer
                         focus:outline-none focus:ring-0
@@ -73,8 +70,6 @@ export const NodeConfiguration = ({
           </div>
         </div>
 
-        {/* Duration Slider */}
-        {/* <div className={`relative ${isSerial ? 'opacity-50 pointer-events-none' : ''}`}> */}
         <div>
           <label className="block text-lg font-medium text-gray-700 mb-2">
             Duration (0 - 15 seconds): {duration}
@@ -86,7 +81,6 @@ export const NodeConfiguration = ({
               max="15"
               value={duration}
               step={isSerial ? 0.1 : 1}
-              // disabled={isSerial}
               onChange={(e) => setDuration(e.target.value)}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
                         focus:outline-none focus:ring-0
@@ -110,29 +104,6 @@ export const NodeConfiguration = ({
           </div>
         </div>
 
-        {/* Order Dropdown */}
-        {/* <div>
-          <label className="block text-lg font-medium text-gray-700 mb-2">
-            Order
-          </label>
-          <select
-            value={order}
-            onChange={(e) => setOrder(Number(e.target.value))}
-            className="w-full border border-gray-300 rounded-md p-2 text-gray-700 focus:border-blue-500 focus:ring-blue-500"
-          >
-            {listings.length === 0 ? (
-              <option value="1">1</option>
-            ) : (
-              Array.from({ length: listings.length + 1 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))
-            )}
-          </select>
-        </div> */}
-
-        {/* Action Buttons */}
         <div className="flex space-x-4 pt-4">
           <button
             onClick={onSave}
