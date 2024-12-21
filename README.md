@@ -54,6 +54,7 @@ Install the required Python packages:
    ```bash
    pip install -r requirements.txt
    ```
+For MacOS, install **pyserial** instead of **serial**.
 
 ### For Arduino IDE (ESP32 Setup)
 _Copy **Hardware > [NEW] VIBRATION CONTROL.ino** and paste to Arduino IDE_
