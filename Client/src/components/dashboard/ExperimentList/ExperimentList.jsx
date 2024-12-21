@@ -13,16 +13,10 @@ export const ExperimentList = ({ experiments }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b">
-              <th className="p-2 text-left text-sm text-gray-500">Index</th>
+              <th className="p-2 text-left text-sm text-gray-500">No.</th>
               <th className="p-2 text-left text-sm text-gray-500">Date</th>
-              <th className="p-2 text-left text-sm text-gray-500">
-                Name Experiment
-              </th>
               <th className="p-2 text-left text-sm text-gray-500">Matrix</th>
-              <th className="p-2 text-left text-sm text-gray-500">
-                Total Nodes
-              </th>
-              <th className="p-2 text-left text-sm text-gray-500">Creator</th>
+              <th className="p-2 text-left text-sm text-gray-500">Type</th>
               <th className="p-2 text-left text-sm text-gray-500">Actions</th>
             </tr>
           </thead>

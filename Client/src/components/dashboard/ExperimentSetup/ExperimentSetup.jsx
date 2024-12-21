@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowBigLeft, Send } from "lucide-react";
 import { Button } from "../../commons/Button";
 import { NodeConfiguration } from "../../commons/NodeConfiguration";
-import { runExp } from "../../apis/callAPI";
+import { createRecord, runExp } from "../../apis/callAPI";
 import SwitchButton from "../../commons/Switch";
 
 export const ExperimentSetup = () => {
@@ -99,9 +99,18 @@ export const ExperimentSetup = () => {
   const handleClick = (row, col) => {
     const order = orders[`${row}-${col}`];
     setButtonProperty(order);
-    setIntensity(0);
-    setDuration(0);
-  };
+
+    const selectedItem = listings.find(item => item.node === order);
+
+    if (selectedItem) {
+        setIntensity(selectedItem.intensity);
+        setDuration(selectedItem.duration);
+    } else {
+        setIntensity(0);
+        setDuration(0);
+    }
+};
+
 
   const handleSimultaneous = () => {
     setOpenSeq(false);
@@ -133,7 +142,6 @@ export const ExperimentSetup = () => {
       }
 
       if (type !== null && delayPerNode !== undefined) {
-        // Transform listings to only include node values
         const transformedListings = listings.map((item) => item.node);
         const transformedDurations = listings.map((item) => item.duration);
         const transformedIntensities = listings.map((item) => item.intensity);
@@ -144,12 +152,36 @@ export const ExperimentSetup = () => {
         payload.delay = parseFloat(delayPerNode); // Ensure it's a number
         payload.type = type;
       }
-      console.log("Payload:", payload);
+      console.log("PAAayload:", payload);
       const response = await runExp(payload);
-      // console.log("Response:", response.data);
-      // setListingsNode(response.data);
     } catch (error) {
       console.error("Error running experiment:", error);
+    }
+  };
+
+  const handleSave = async () => {
+    const payload = {
+      listings,
+      type,
+    };
+    try {
+      if (type !== null) {
+        const transformedListings = listings.map(item => item.node);
+        const transformedDurations = listings.map(item => item.duration);
+        const transformedIntensities = listings.map(item => item.intensity);
+    
+        payload.listings = transformedListings;
+        payload.duration = transformedDurations;
+        payload.intensity = transformedIntensities;
+        payload.delay = delayPerNode !== undefined ? parseFloat(delayPerNode) : 0; 
+        payload.type = type;
+        payload.matrixSize = `${matrixSize}x${matrixSize}`;
+    }
+      console.log("AAAPayload:", payload);
+      const response = await createRecord(payload);
+      console.log("Record saved successfully:", response.data);
+    } catch (error) {
+      console.error("Error saving record:", error.message);
     }
   };
 
@@ -214,15 +246,26 @@ export const ExperimentSetup = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="mt-4 flex items-center justify-center w-full">
+        <div className="mt-4 flex items-center justify-center gap-2 w-full">
           <Button
             onClick={handleSubmit}
-            className="w-full px-8 py-6 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white text-2xl font-bold rounded-full shadow-md hover:shadow-lg hover:from-green-500 hover:to-green-700 flex items-center justify-center transition-all duration-300"
+            className="w-1/2 px-8 py-6 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white text-2xl font-bold rounded-full shadow-md hover:shadow-lg hover:from-green-500 hover:to-green-700 flex items-center justify-center transition-all duration-300"
           >
             <Send size={30} className="mr-3" />
-            Activating Vibration Motor
+            Run
           </Button>
+
+          <Button
+            onClick={handleSave}
+            className="w-1/2 px-8 py-6 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white text-2xl font-bold rounded-full shadow-md hover:shadow-lg hover:from-green-500 hover:to-green-700 flex items-center justify-center transition-all duration-300"
+          >
+            <Send size={30} className="mr-3" />
+            Save 
+          </Button>
+          
         </div>
+
+        
         {/* Sequential and Simultaneous Buttons */}
       </div>
 
