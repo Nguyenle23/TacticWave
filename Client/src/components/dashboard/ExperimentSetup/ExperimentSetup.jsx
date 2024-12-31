@@ -152,7 +152,6 @@ export const ExperimentSetup = () => {
         payload.delay = parseFloat(delayPerNode); // Ensure it's a number
         payload.type = type;
       }
-      console.log("PAAayload:", payload);
       const response = await runExp(payload);
     } catch (error) {
       console.error("Error running experiment:", error);

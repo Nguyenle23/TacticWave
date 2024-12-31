@@ -15,6 +15,7 @@ export const ExperimentItem = ({
 }) => {
   const [transformedConfig, setTransformedConfig] = useState(config); // Lưu `config` đã xử lý
   const [isProcessing, setIsProcessing] = useState(false);
+  const [vibratingTimeStart, setVibratingTimeStart] = useState([])
 
   const transformData = (input) => ({
     listings: input.listings.map((node, index) => ({
@@ -44,27 +45,59 @@ export const ExperimentItem = ({
   const handlePlayExp = () => {
     // Nếu đang xử lý, không làm gì cả
     if (isProcessing) {
-      console.log('Đang xử lý. Vui lòng chờ...');
+      console.log("Đang xử lý. Vui lòng chờ...");
       return;
     }
-
+  
+    // Lấy thời gian hiện tại
+    const now = new Date();
+    const formattedTime = `${String(now.getHours()).padStart(2, "0")}:${String(
+      now.getMinutes()
+    ).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}:${String(
+      now.getMilliseconds()
+    ).padStart(3, "0")}`;
+  
+    console.log(`Hàm được gọi vào lúc: ${formattedTime}`);
+  
     // Đặt cờ xử lý thành true và thông báo cho ExperimentList
     setIsProcessing(true);
     onStartProcessing();
-
+  
     // Tạo một số nguyên ngẫu nhiên từ 1 đến 3
     const delay = Math.floor(Math.random() * 3) + 1; // 1, 2 hoặc 3
-
+  
     console.log(`Đang trì hoãn thực thi trong ${delay} giây...`);
-
+  
     setTimeout(() => {
-      console.log("Chạy thử nghiệm với config:", transformedConfig);
-      
+      const finishedTime = new Date();
+      const formattedFinishedTime = `${String(finishedTime.getHours()).padStart(
+        2,
+        "0"
+      )}:${String(finishedTime.getMinutes()).padStart(2, "0")}:${String(
+        finishedTime.getSeconds()
+      ).padStart(2, "0")}:${String(finishedTime.getMilliseconds()).padStart(
+        3,
+        "0"
+      )}`;
+  
+      // Lấy mảng hiện tại từ localStorage (hoặc tạo mảng mới nếu chưa có)
+      const existingTimes = JSON.parse(localStorage.getItem("vibratingTimes")) || [];
+  
+      // Thêm thời gian mới vào mảng
+      const updatedTimes = [...existingTimes, formattedFinishedTime];
+  
+      // Ghi lại mảng mới vào localStorage
+      localStorage.setItem("vibratingTimes", JSON.stringify(updatedTimes));
+  
+      console.log("Vibrating times:", updatedTimes); // In mảng cập nhật
+  
       // Reset cờ xử lý và thông báo cho ExperimentList
       setIsProcessing(false);
       onEndProcessing();
     }, delay * 1000); // Chuyển sang milliseconds
   };
+  
+  
 
   // Kích hoạt lại `handlePlayExp` khi `activatePlay` thay đổi
   useEffect(() => {
