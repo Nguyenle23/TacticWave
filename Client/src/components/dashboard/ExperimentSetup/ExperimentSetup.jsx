@@ -216,7 +216,7 @@ export const ExperimentSetup = () => {
           <button onClick={handleReset}>Reset Nodes</button>
         </div>
 
-        {/* <p>{JSON.stringify(listings)}</p> */}
+        <p>{JSON.stringify(listings)}</p>
 
         {/* Matrix Display */}
         <div

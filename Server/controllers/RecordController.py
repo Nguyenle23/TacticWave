@@ -88,13 +88,17 @@ from flask import request, jsonify
 import os
 from datetime import datetime
 import pandas as pd
+import uuid
+
 
 def export_data_to_excel(nodes, intensity, duration, data_type, delay, matrixSize):
     folder_name = "Experiment Data"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
 
-    filename = datetime.now().strftime('%Y-%m-%d_%Hh%Mp') + '.xlsx'
+    # filename = datetime.now().strftime('%Y-%m-%d_%Hh%Mp') + '.xlsx'
+    filename = str(uuid.uuid4()) + '.xlsx'
+
     file_path = os.path.join(folder_name, filename)
 
     # Tạo DataFrame

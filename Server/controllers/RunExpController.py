@@ -86,7 +86,7 @@ def send_motor_command(item, max_duration, motor_delay):
             print(f"Phản hồi từ ESP32: {response}")
         else:
             print("Không nhận được phản hồi từ ESP32.")
-
+        
     except Exception as e:
         print(f"Lỗi: {e}")
         return jsonify({'error': str(e)}), 500
@@ -102,7 +102,7 @@ class RunExpController:
 
                 if motor_type == 'Simultaneous':
                     grp_data = group_dicts_by_order(motor_data)
-                    print("@@@@@@", grp_data)
+                    # print("@@@@@@", grp_data)
                     if isinstance(grp_data, list):
                         responses = []
                         max_durations = get_max_duration(grp_data)
@@ -111,9 +111,10 @@ class RunExpController:
                             responses.append({
                                 'message': f'Motor command sent to node_number'
                             })
+                        print("yayayaya")
                         return jsonify(responses), 200
-                    else:
-                        return jsonify({'error': 'Invalid request method'}), 405
+                    # else:
+                    #     return jsonify({'error': 'Invalid request method'}), 405
                 elif motor_type == 'Serial':
                     item = {
                         'type': motor_type,
@@ -124,6 +125,7 @@ class RunExpController:
                     }
                     timeSleep = math.ceil(sum(item['vibrationTime']) + item['delayBetweenMotors'] * (len(item['motor_pins']) - 1))
                     send_motor_command(item, timeSleep, 1)  # No delay for Simultaneous type
+                    
 
                 elif motor_type == 'Overlap':
                     item = {
