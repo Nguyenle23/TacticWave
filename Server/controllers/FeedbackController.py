@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from utils.excel_util import export_data_to_excel
+# from utils.excel_util import export_data_to_excel
 
 
 class FeedbackController:
@@ -8,8 +8,8 @@ class FeedbackController:
             data = request.json
             print(data)
             try:
-                filename, location = export_data_to_excel(data, "feedback")
-                return jsonify({'filename': filename, 'location': location})
+                # filename, location = export_data_to_excel(data, "feedback")
+                return jsonify({'filename': "filename", 'location': "location"})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
             except Exception as e:

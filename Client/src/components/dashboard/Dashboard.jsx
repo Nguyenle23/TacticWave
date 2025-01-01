@@ -135,13 +135,14 @@ export const Dashboard = () => {
               <ExperimentList
                 isSubmitID={isSubmitID}
                 experiments={experiments}
+                userID={userID}
               />
             </div>
           )}
         </div>
-        <div className="w-full lg:w-80">
+        {/* <div className="w-full lg:w-80">
           <Statistics />
-        </div>
+        </div> */}
       </div>
     </>
   );

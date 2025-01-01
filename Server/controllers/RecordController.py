@@ -25,9 +25,11 @@ def export_data_to_excel(nodes, intensity, duration, data_type, delay, matrixSiz
 
     # Ghi DataFrame ra file Excel
     with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name=f'{data_type} - {matrixSize}')
+        df.to_excel(writer, index=False,
+                    sheet_name=f'{data_type} - {matrixSize}')
 
     return filename, os.path.abspath(file_path)
+
 
 def get_elements_from_csv(csv_path, user_id):
     """
@@ -45,7 +47,8 @@ def get_elements_from_csv(csv_path, user_id):
 
         # Kiểm tra đủ số dòng
         if row_index >= df.shape[0]:
-            print(f"File CSV chỉ có {df.shape[0]} dòng, không đủ để lấy dữ liệu từ dòng {user_id}.")
+            print(
+                f"File CSV chỉ có {df.shape[0]} dòng, không đủ để lấy dữ liệu từ dòng {user_id}.")
             return []
 
         # Cột G là cột index=6
@@ -53,7 +56,8 @@ def get_elements_from_csv(csv_path, user_id):
 
         # Kiểm tra đủ số cột
         if df.shape[1] <= col_index:
-            print(f"File CSV chỉ có {df.shape[1]} cột, không đủ để lấy dữ liệu từ cột G.")
+            print(
+                f"File CSV chỉ có {df.shape[1]} cột, không đủ để lấy dữ liệu từ cột G.")
             return []
 
         # Lấy giá trị ở dòng tương ứng và cột G
@@ -77,11 +81,11 @@ def get_elements_from_csv(csv_path, user_id):
 def get_matched_excel_files(folder_path, elements):
     if not os.path.isdir(folder_path):
         return []
-    
+
     all_files = os.listdir(folder_path)
 
     excel_files = [f for f in all_files if f.endswith('.xlsx')]
-    
+
     elements_copy = elements.copy()
 
     matched_files = []
@@ -98,6 +102,7 @@ def get_matched_excel_files(folder_path, elements):
 
     return matched_files
 
+
 def check_and_process_excel_files(csv_path, folder_path, user_id):
     """
     Đọc danh sách phần tử từ cột G{user_id} trong CSV,
@@ -105,20 +110,22 @@ def check_and_process_excel_files(csv_path, folder_path, user_id):
     """
     # Lấy danh sách các phần tử tương ứng với userID
     elements = get_elements_from_csv(csv_path, user_id)
-    
+
     if not elements:
-        print(f'Không thể lấy danh sách các phần tử từ cột G{user_id} hoặc danh sách rỗng.')
+        print(
+            f'Không thể lấy danh sách các phần tử từ cột G{user_id} hoặc danh sách rỗng.')
         return jsonify({'error': f'Không thể lấy danh sách các phần tử từ cột G{user_id} hoặc danh sách rỗng.'}), 400
-    
+
     unmatched_elements = elements.copy()
     experiments = []
     max_iterations = len(unmatched_elements)  # tránh vòng lặp vô hạn
-    
+
     for iteration in range(max_iterations):
-        matched_files = get_matched_excel_files(folder_path, unmatched_elements)
+        matched_files = get_matched_excel_files(
+            folder_path, unmatched_elements)
         if not matched_files:
             break
-        
+
         new_matches_found = False
         for file in matched_files:
             file_path = os.path.join(folder_path, file)
@@ -129,14 +136,15 @@ def check_and_process_excel_files(csv_path, folder_path, user_id):
                     _, matrixSize = sheet_name.split(" - ")
                 except ValueError:
                     matrixSize = "Unknown"
-                
+
                 df = pd.read_excel(file_path, sheet_name=sheet_name)
                 date = file.replace(".xlsx", "")
-    
-                required_columns = ['type', 'delay', 'node', 'intensity', 'duration']
+
+                required_columns = ['type', 'delay',
+                                    'node', 'intensity', 'duration']
                 if not all(col in df.columns for col in required_columns):
                     continue
-    
+
                 data_type = df['type'].iloc[0]
                 delay = float(df['delay'].iloc[0])
                 listings = df['node'].dropna().astype(str).tolist()
@@ -150,7 +158,7 @@ def check_and_process_excel_files(csv_path, folder_path, user_id):
                     "intensity": intensity,
                     "delay": delay
                 }
-    
+
                 experiments.append({
                     'date': date,
                     'config': config,
@@ -158,22 +166,22 @@ def check_and_process_excel_files(csv_path, folder_path, user_id):
                     'type': data_type
                 })
 
-                
                 file_name, _ = os.path.splitext(file)
                 if file_name in unmatched_elements:
                     unmatched_elements.remove(file_name)
                     new_matches_found = True
-                
+
             except Exception as e:
                 return jsonify({'error': f"Error processing file {file}: {str(e)}"}), 500
-        
+
         if not new_matches_found:
             break
-    
+
     if experiments:
         return jsonify({'result': experiments})
     else:
         return jsonify({"result": [], "message": f"Không tìm thấy file Excel nào phù hợp với G{user_id}."})
+
 
 class RecordController:
     def getAndcreateRecord(userID=None):
@@ -197,7 +205,7 @@ class RecordController:
 
             try:
                 filename, location = export_data_to_excel(
-                    nodes, intensity, duration, data_type, delay, matrixSize, 
+                    nodes, intensity, duration, data_type, delay, matrixSize,
                 )
                 return jsonify({'filename': filename, 'location': location})
             except Exception as e:
@@ -209,7 +217,7 @@ class RecordController:
             print(user_id)
             if not user_id:
                 return jsonify({'error': 'Thiếu tham số userID trong yêu cầu GET.'}), 400
-            
+
             # Ép user_id sang số nguyên để tính chỉ số cột
             try:
                 user_id = int(user_id)
@@ -220,8 +228,13 @@ class RecordController:
             if not (1 <= user_id <= 16):
                 return jsonify({'error': 'userID không hợp lệ. Phải nằm trong khoảng 1 đến 16.'}), 400
 
+            # path asus
             csv_path = 'C:/Users/user/Documents/GitHub/TacticWave/Server/Fetch Data/Testing_Box.csv'
             folder_path = 'C:/Users/user/Documents/GitHub/TacticWave/Server/Experiment Data'
+
+            # path macbook
+            # csv_path = "/Users/nguyenle/Developer/TacticWave/Server/Fetch Data/Testing_Box.csv"
+            # folder_path = "/Users/nguyenle/Developer/TacticWave/Server/Experiment Data"
 
             if not os.path.exists(folder_path):
                 return jsonify({'error': f'Thư mục {folder_path} không tồn tại.'}), 404
@@ -230,5 +243,3 @@ class RecordController:
 
         else:
             return jsonify({'error': 'Invalid request method'}), 405
-
-

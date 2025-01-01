@@ -8,6 +8,7 @@ esp32_port = 'COM4'  # Thay bằng cổng Serial ESP32
 baud_rate = 115200
 timeout = 1
 
+
 def convert_node_number(node_number):
     """
     Convert node number according to the provided mapping:
@@ -34,6 +35,7 @@ def convert_node_number(node_number):
 
     return mapping.get(node_number, None)
 
+
 def transform_motor_data(data):
     transformed_data = []
     for item in data:
@@ -48,6 +50,7 @@ def transform_motor_data(data):
 
     return transformed_data
 
+
 def group_dicts_by_order(data_list):
     array = transform_motor_data(data_list)
     grouped = {}
@@ -57,13 +60,17 @@ def group_dicts_by_order(data_list):
             grouped.setdefault(order, []).append(item)
     return list(grouped.values())
 
+
 def wrap_in_list(data):
     return [[item] for item in data]
 
+
 def get_max_duration(data):
-   
-    max_durations = [max(group, key=lambda x: x['Duration'])['Duration'] for group in data]
+
+    max_durations = [max(group, key=lambda x: x['Duration'])[
+        'Duration'] for group in data]
     return max_durations
+
 
 def send_motor_command(item, max_duration, motor_delay):
     try:
@@ -80,24 +87,27 @@ def send_motor_command(item, max_duration, motor_delay):
 
         # Chờ dựa trên max_duration và motor_delay
         time.sleep(max_duration / 1000 + float(motor_delay))
-        
+
         if ser.in_waiting > 0:
             response = ser.readline().decode('utf-8').strip()
             print(f"Phản hồi từ ESP32: {response}")
         else:
             print("Không nhận được phản hồi từ ESP32.")
-        
+
     except Exception as e:
         print(f"Lỗi: {e}")
         return jsonify({'error': str(e)}), 500
+
 
 class RunExpController:
     def send_motor_command_from_request():
         if request.method == 'POST':
             try:
                 print('hạahaha', request.json)
-                motor_data = request.json['listings']  # This is now expected to be a list of motor commands
-                motor_type = request.json['type']  # This is now expected to be a list of motor commands
+                # This is now expected to be a list of motor commands
+                motor_data = request.json['listings']
+                # This is now expected to be a list of motor commands
+                motor_type = request.json['type']
                 motor_delay = None
 
                 if motor_type == 'Simultaneous':
@@ -107,7 +117,8 @@ class RunExpController:
                         responses = []
                         max_durations = get_max_duration(grp_data)
                         for idx, item in enumerate(grp_data):
-                            send_motor_command(item, max_durations[idx], 0)  # No delay for Simultaneous type
+                            # No delay for Simultaneous type
+                            send_motor_command(item, max_durations[idx], 0)
                             responses.append({
                                 'message': f'Motor command sent to node_number'
                             })
@@ -123,9 +134,12 @@ class RunExpController:
                         'vibrationIntensity': request.json['intensity'],
                         'delayBetweenMotors': request.json['delay']*1000
                     }
-                    timeSleep = math.ceil(sum(item['vibrationTime']) + item['delayBetweenMotors'] * (len(item['motor_pins']) - 1))
-                    send_motor_command(item, timeSleep, 1)  # No delay for Simultaneous type
-                    
+                    timeSleep = math.ceil(sum(
+                        item['vibrationTime']) + item['delayBetweenMotors'] * (len(item['motor_pins']) - 1))
+                    # No delay for Simultaneous type
+                    send_motor_command(item, timeSleep, 1)
+                    print("hohohoho", item)
+                    return jsonify({"response": "ok"}), 200
 
                 elif motor_type == 'Overlap':
                     item = {
@@ -135,10 +149,13 @@ class RunExpController:
                         'activeIntensity': request.json['intensity'],
                         'delayBetweenMotors': request.json['delay']*1000
                     }
-                    timeSleep = max(i * item['delayBetweenMotors'] + duration for i, duration in enumerate(item['activeDurations'])) + 1000
+                    timeSleep = max(i * item['delayBetweenMotors'] + duration for i,
+                                    duration in enumerate(item['activeDurations'])) + 1000
 
-                    send_motor_command(item, timeSleep, 1)  # No delay for Simultaneous type
+                    # No delay for Simultaneous type
+                    send_motor_command(item, timeSleep, 1)
                     print("ahihihihi", item)
+                    return jsonify({"response": "ok"}), 200
 
                 else:
                     motor_delay = request.json['delay']
@@ -147,12 +164,12 @@ class RunExpController:
                     print('lalalala', grp_data)
                     responses = []
                     for idx, item in enumerate(grp_data):
-                        send_motor_command(item, max_durations[idx], motor_delay)
+                        send_motor_command(
+                            item, max_durations[idx], motor_delay)
                         responses.append({
                             'message': f'Motor command sent to node_number'
                         })
                     return jsonify(responses), 200
-                    
 
             except Exception as e:
                 print(e)
